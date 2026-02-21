@@ -3,103 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FF Store - Premium Topup</title>
+    <title>FF Store - Topup App</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #2196F3; --secondary: #1976D2; --bg: #F8FAFC; --white: #FFFFFF; --text: #1E293B; --green: #10B981; --border: #E2E8F0; --instamojo: #733dfa; }
+        :root { --primary: #2196F3; --bg: #F8FAFC; --white: #FFFFFF; --text: #1E293B; --border: #E2E8F0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
 
-        .banner-container { width: 100%; height: 180px; overflow: hidden; position: relative; background: #eee; margin-bottom: 5px; }
-        .banner-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
-        .banner-slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; }
-        .slider-dots { position: absolute; bottom: 12px; width: 100%; text-align: center; }
-        .dot { height: 6px; width: 6px; background: rgba(255,255,255,0.4); border-radius: 50%; display: inline-block; margin: 0 4px; transition: 0.3s; }
-        .dot.active { background: var(--white); width: 18px; border-radius: 10px; }
+        /* Auth Screen */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 2000; padding: 30px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+        .input-box { width: 100%; padding: 14px; background: #F1F5F9; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); outline: none; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; }
 
-        #auth-screen { position: fixed; inset: 0; background: var(--white); z-index: 2000; padding: 30px; display: flex; flex-direction: column; justify-content: center; }
-        .input-box { width: 100%; padding: 14px 18px; background: #F1F5F9; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); outline: none; transition: 0.3s; font-size: 14px; }
-        .input-box:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1); }
-        .btn-main { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3); }
-        
+        /* App UI */
         .app-header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .header-balance { background: #EFF6FF; color: var(--primary); padding: 6px 14px; border-radius: 50px; font-weight: 700; font-size: 14px; border: 1px solid #DBEAFE; }
+        .header-balance { background: #EFF6FF; color: var(--primary); padding: 6px 14px; border-radius: 50px; font-weight: 700; font-size: 14px; }
 
-        .wallet-card { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; margin: 15px; padding: 25px; border-radius: 24px; position: relative; overflow: hidden; }
-        .wallet-amount { font-size: 32px; font-weight: 700; margin: 5px 0 15px; }
+        .banner-container { width: 100%; height: 160px; overflow: hidden; position: relative; margin-top: 5px; }
+        .banner-wrapper { display: flex; transition: 0.5s; height: 100%; }
+        .banner-slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; }
 
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
-        .pkg-card { background: var(--white); padding: 20px 15px; border-radius: 18px; text-align: center; border: 1px solid var(--border); transition: 0.3s; }
-        .pkg-amt { font-weight: 700; font-size: 18px; color: var(--text); display: block; }
-        .pkg-price { color: var(--primary); font-weight: 600; font-size: 14px; margin-top: 4px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+        .pkg-card { background: white; padding: 20px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
+        .pkg-amt { font-weight: 700; font-size: 18px; display: block; }
+        .pkg-price { color: var(--primary); font-weight: 600; font-size: 14px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 100; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
-        .nav-icon { text-align: center; color: #94A3B8; font-size: 10px; font-weight: 500; flex: 1; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 100; }
+        .nav-icon { text-align: center; color: #94A3B8; font-size: 10px; flex: 1; }
         .nav-icon.active { color: var(--primary); }
-        .nav-icon i { font-size: 20px; margin-bottom: 4px; display: block; }
+        .nav-icon i { font-size: 20px; display: block; margin-bottom: 4px; }
 
-        .list-item { background: var(--white); padding: 15px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 1px solid var(--border); transition: 0.5s; }
-        .status-badge { font-size: 10px; padding: 4px 10px; border-radius: 6px; font-weight: 700; text-transform: uppercase; }
+        .list-item { background: white; padding: 15px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin: 0 15px 10px; border: 1px solid var(--border); }
+        .status-badge { font-size: 10px; padding: 4px 8px; border-radius: 5px; font-weight: 700; text-transform: uppercase; }
         .st-pending { color: #D97706; background: #FEF3C7; }
-        .st-success, .st-completed { color: #059669; background: #D1FAE5; }
-        .st-rejected { color: #DC2626; background: #FEE2E2; }
+        .st-success { color: #059669; background: #D1FAE5; }
 
-        .modal-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; overflow-y: auto; display: none; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .page { display: none; padding-top: 10px; }
+        .modal { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: none; overflow-y: auto; }
+        .page { display: none; }
         .page.active { display: block; }
     </style>
 </head>
 <body>
 
+    <!-- Login Screen -->
     <div id="auth-screen">
-        <div style="text-align:center; margin-bottom: 40px;">
-            <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: white; font-size: 30px; box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);"><i class="fa-solid fa-bolt"></i></div>
-            <h2 style="font-weight: 700;">FF Store</h2>
-            <p style="color: #64748B; font-size: 14px;">Login to start your Topup</p>
-        </div>
+        <h2 style="margin-bottom: 10px; color: var(--primary);">FF Store Login</h2>
+        <p style="margin-bottom: 30px; color: #64748B;">Enter your email to continue</p>
         <input type="email" id="login-email" class="input-box" placeholder="Email Address">
-        <input type="password" id="login-pass" class="input-box" placeholder="Password">
-        <button class="btn-main" onclick="handleAuth()">Continue</button>
+        <input type="password" id="login-pass" class="input-box" placeholder="Password (min 6 chars)">
+        <button class="btn-main" onclick="handleAuth()">Login / Register</button>
     </div>
 
+    <!-- Main App UI -->
     <div id="main-app" style="display: none;">
         <div class="app-header">
-            <div style="font-weight:800; font-size: 18px; color: var(--primary);">FF STORE</div>
+            <div style="font-weight:800; color: var(--primary);">FF STORE</div>
             <div class="header-balance" onclick="nav('wallet')"><i class="fa-solid fa-wallet"></i> ₹<span id="header-bal-amt">0</span></div>
         </div>
 
+        <!-- HOME -->
         <div id="home-page" class="page active">
             <div class="banner-container">
                 <div class="banner-wrapper" id="banner-track"></div>
-                <div class="slider-dots" id="banner-dots"></div>
             </div>
-            <h3 style="padding: 15px 20px 10px; font-weight: 700;">Topup Diamonds</h3>
+            <h4 style="margin: 20px 15px 10px;">Select Diamond Pack</h4>
             <div class="grid" id="packages-grid"></div>
         </div>
 
+        <!-- WALLET -->
         <div id="wallet-page" class="page">
-            <div class="wallet-card">
-                <div style="font-size: 13px; opacity: 0.8;">Available Balance</div>
-                <div class="wallet-amount">₹<span id="main-bal-amt">0</span></div>
-                <button onclick="openAddMoney()" style="background: white; color: var(--text); border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 13px;">+ Add Money</button>
+            <div style="background: #1e293b; color: white; margin: 15px; padding: 25px; border-radius: 20px;">
+                <p style="font-size: 12px; opacity: 0.7;">Current Balance</p>
+                <h1 style="font-size: 32px; margin: 5px 0;">₹<span id="main-bal-amt">0</span></h1>
+                <button onclick="openModal('add-money-modal')" style="background: var(--primary); border:none; color:white; padding:8px 15px; border-radius:10px; margin-top:10px; font-weight:600;">+ Add Money</button>
             </div>
-            <h4 style="padding: 0 20px 10px;">Transactions History</h4>
-            <div class="list-container" id="trans-list" style="padding: 0 15px;"></div>
+            <h4 style="margin: 20px 15px 10px;">Transaction History</h4>
+            <div id="trans-list"></div>
         </div>
 
+        <!-- PROFILE / ORDERS -->
         <div id="profile-page" class="page">
-            <div style="background: white; margin: 15px; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid var(--border);">
-                <div style="width:60px; height:60px; background:#F1F5F9; border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:24px;"><i class="fa-solid fa-circle-user"></i></div>
-                <h3 id="disp-email" style="font-size:14px; margin-bottom: 15px;">User</h3>
-                <button class="btn-main" onclick="contactSupport()" style="background: #25D366; font-size: 13px;"><i class="fa-brands fa-whatsapp"></i> WhatsApp Support</button>
-                <button class="btn-main" onclick="auth.signOut()" style="background: #F1F5F9; color: #EF4444; box-shadow: none; font-size: 13px; margin-top:10px;">Logout</button>
+            <div style="background: white; margin: 15px; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid var(--border);">
+                <p id="disp-email" style="font-weight: 600; margin-bottom: 10px;">User</p>
+                <button class="btn-main" style="background: #25D366; font-size: 13px;" onclick="contactSupport()"><i class="fa-brands fa-whatsapp"></i> WhatsApp Support</button>
+                <p onclick="auth.signOut()" style="color:red; margin-top:15px; font-size:13px; font-weight:600;">Logout Account</p>
             </div>
-            <h4 style="padding: 0 20px 10px;">Order History</h4>
-            <div class="list-container" id="order-history" style="padding: 0 15px;"></div>
+            <h4 style="margin: 20px 15px 10px;">My Orders</h4>
+            <div id="order-history"></div>
         </div>
 
+        <!-- Navigation -->
         <div class="bottom-nav">
             <div class="nav-icon active" onclick="nav('home')"><i class="fa-solid fa-house"></i>Home</div>
             <div class="nav-icon" onclick="nav('wallet')"><i class="fa-solid fa-wallet"></i>Wallet</div>
@@ -107,39 +101,40 @@
         </div>
     </div>
 
-    <!-- ADD MONEY MODAL (Instamojo Integrated) -->
-    <div id="add-money-modal" class="modal-overlay">
-        <div style="padding: 20px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
-            <i class="fa-solid fa-chevron-left" onclick="closeModal('add-money-modal')"></i>
-            <span style="font-weight: 700;">Deposit via Instamojo</span>
+    <!-- ADD MONEY MODAL -->
+    <div id="add-money-modal" class="modal">
+        <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
+            <i class="fa-solid fa-arrow-left" onclick="closeModal('add-money-modal')"></i>
+            <span style="font-weight: 700;">Deposit Money</span>
         </div>
         <div style="padding: 20px;">
-            <div style="background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px;">
-                <label style="font-size: 12px; color: #64748B; margin-bottom: 8px; display: block;">Step 1: Pay using the link</label>
-                <input type="number" id="pay-amount" class="input-box" placeholder="₹ Enter Amount">
-                <button class="btn-main" onclick="payNow()" style="background: var(--instamojo);"><i class="fa-solid fa-credit-card"></i> Open Instamojo Payment</button>
+            <div style="background:white; padding:20px; border-radius:15px; border:1px solid #eee; margin-bottom:20px;">
+                <label style="font-size:12px; color:#666;">Step 1: Enter Amount & Pay</label>
+                <input type="number" id="pay-amount" class="input-box" style="margin-top:10px" placeholder="₹ Amount">
+                <button class="btn-main" onclick="openInstamojo()" style="background: #733dfa;">Open Instamojo Link</button>
             </div>
-            <div style="background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border);">
-                <label style="font-size: 12px; color: #64748B; margin-bottom: 8px; display: block;">Step 2: Enter Instamojo Payment ID</label>
-                <input type="text" id="req-utr" class="input-box" placeholder="Ex: MOJO1234...">
+            <div style="background:white; padding:20px; border-radius:15px; border:1px solid #eee;">
+                <label style="font-size:12px; color:#666;">Step 2: Submit Payment ID / UTR</label>
+                <input type="text" id="req-utr" class="input-box" style="margin-top:10px" placeholder="Payment ID">
                 <button class="btn-main" onclick="submitDeposit()">Submit for Approval</button>
             </div>
         </div>
     </div>
 
-    <div id="purchase-modal" class="modal-overlay">
-        <div style="padding: 20px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
-            <i class="fa-solid fa-chevron-left" onclick="closeModal('purchase-modal')"></i>
-            <span style="font-weight: 700;">Confirm Order</span>
+    <!-- PURCHASE MODAL -->
+    <div id="purchase-modal" class="modal">
+        <div style="padding: 20px; display: flex; align-items: center; gap: 15px;">
+            <i class="fa-solid fa-arrow-left" onclick="closeModal('purchase-modal')"></i>
+            <span style="font-weight: 700;">Checkout</span>
         </div>
         <div style="padding: 20px;">
-            <div style="background: white; padding: 30px 20px; border-radius: 20px; text-align: center; border: 1px solid var(--border); margin-bottom: 20px;">
-                <h2 id="buy-pkg-title">...</h2>
-                <h1 style="color: var(--primary); font-size: 32px; margin: 5px 0;" id="buy-pkg-price">...</h1>
+            <div style="background: white; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #eee; margin-bottom: 20px;">
+                <h3 id="buy-pkg-title">...</h3>
+                <h2 id="buy-pkg-price" style="color: var(--primary); margin-top:5px;">...</h2>
             </div>
-            <input type="text" id="order-uid" class="input-box" placeholder="Game Player UID">
+            <input type="text" id="order-uid" class="input-box" placeholder="Player UID">
             <input type="text" id="order-name" class="input-box" placeholder="Game Name">
-            <button class="btn-main" onclick="processOrder()">Confirm Purchase</button>
+            <button class="btn-main" onclick="processOrder()">Buy Now</button>
         </div>
     </div>
 
@@ -158,15 +153,14 @@
             appId: "1:59905181993:web:8ad4f721ac50c09c478f38",
             measurementId: "G-QHHJ1BJWMP"
         };
-        
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
-        
+
         let currentUser = null;
         let selectedPack = null;
-        let supportLink = "";
 
+        // AUTH LOGIC
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
@@ -183,16 +177,19 @@
         function handleAuth() {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
-            if(!e || p.length < 6) return alert("Enter valid credentials (min 6 chars)");
-            auth.signInWithEmailAndPassword(e, p).catch(() => {
-                auth.createUserWithEmailAndPassword(e, p).then(creds => {
-                    db.ref('users/'+creds.user.uid).set({ balance: 0, email: e, name: 'User' });
-                }).catch(err => alert(err.message));
+            if (!e || p.length < 6) return alert("Enter valid email and 6-char password");
+
+            auth.signInWithEmailAndPassword(e, p).catch(err => {
+                if (err.code === 'auth/user-not-found') {
+                    auth.createUserWithEmailAndPassword(e, p).then(c => {
+                        db.ref('users/' + c.user.uid).set({ balance: 0, email: e });
+                    });
+                } else { alert(err.message); }
             });
         }
 
         function loadData() {
-            db.ref('users/'+currentUser.uid+'/balance').on('value', s => {
+            db.ref('users/' + currentUser.uid + '/balance').on('value', s => {
                 const b = s.val() || 0;
                 document.getElementById('header-bal-amt').innerText = b;
                 document.getElementById('main-bal-amt').innerText = b;
@@ -204,81 +201,53 @@
                     const p = c.val();
                     const div = document.createElement('div');
                     div.className = 'pkg-card';
-                    div.innerHTML = `<i class="fa-regular fa-gem" style="color:#00BCD4; font-size:20px; margin-bottom:8px;"></i><span class="pkg-amt">${p.diamonds} DM</span><span class="pkg-price">₹${p.price}</span>`;
-                    div.onclick = () => { 
-                        selectedPack = p; 
-                        document.getElementById('purchase-modal').style.display='block'; 
-                        document.getElementById('buy-pkg-title').innerText = p.diamonds+" Diamonds"; 
-                        document.getElementById('buy-pkg-price').innerText = "₹"+p.price; 
+                    div.innerHTML = `<span class="pkg-amt">${p.diamonds} DM</span><span class="pkg-price">₹${p.price}</span>`;
+                    div.onclick = () => {
+                        selectedPack = p;
+                        openModal('purchase-modal');
+                        document.getElementById('buy-pkg-title').innerText = p.diamonds + " Diamonds";
+                        document.getElementById('buy-pkg-price').innerText = "₹" + p.price;
                     };
                     g.appendChild(div);
                 });
             });
 
-            db.ref('settings/supportLink').on('value', s => { supportLink = s.val(); });
-            
             loadHistory();
-            initBannerSlider();
         }
 
         function loadHistory() {
             db.ref('transactions').orderByChild('uid').equalTo(currentUser.uid).on('value', snap => {
-                const l = document.getElementById('trans-list'); l.innerHTML='';
-                let items = []; snap.forEach(c => items.push({key: c.key, ...c.val()}));
-                items.sort((a,b) => b.timestamp - a.timestamp).forEach(t => {
-                    l.innerHTML += `
-                    <div class="list-item" id="tx-${t.key}">
-                        <div>
-                            <div style="font-size:13px; font-weight:600;">${t.description}</div>
-                            <div style="font-size:10px; color:#94A3B8;">${new Date(t.timestamp).toLocaleString()}</div>
-                        </div>
-                        <div style="text-align:right">
-                            <div style="font-weight:700; color:${t.type=='credit'?'#10B981':'#EF4444'}">₹${t.amount}</div>
-                            <span class="status-badge st-${t.status}">${t.status}</span>
-                        </div>
-                    </div>`;
-                    if(t.status !== 'pending') autoDelete('transactions', t.key, `tx-${t.key}`);
+                const l = document.getElementById('trans-list'); l.innerHTML = '';
+                snap.forEach(c => {
+                    const t = c.val();
+                    l.innerHTML += `<div class="list-item"><div><p style="font-size:13px; font-weight:600">${t.description}</p></div><div style="text-align:right"><p style="font-weight:700">₹${t.amount}</p><span class="status-badge st-${t.status}">${t.status}</span></div></div>`;
                 });
             });
 
             db.ref('orders').orderByChild('placedByUid').equalTo(currentUser.uid).on('value', snap => {
-                const l = document.getElementById('order-history'); l.innerHTML='';
-                let items = []; snap.forEach(c => items.push({key: c.key, ...c.val()}));
-                items.sort((a,b) => b.timestamp - a.timestamp).forEach(o => {
-                    l.innerHTML += `
-                    <div class="list-item" id="ord-${o.key}">
-                        <div><div style="font-size:13px; font-weight:600;">${o.diamonds} DM</div><div style="font-size:10px; color:#94A3B8;">UID: ${o.targetUid}</div></div>
-                        <span class="status-badge st-${o.status}">${o.status}</span>
-                    </div>`;
-                    if(o.status !== 'pending') autoDelete('orders', o.key, `ord-${o.key}`);
+                const l = document.getElementById('order-history'); l.innerHTML = '';
+                snap.forEach(c => {
+                    const o = c.val();
+                    l.innerHTML += `<div class="list-item"><div><p style="font-size:13px; font-weight:600">${o.diamonds} DM</p><small>UID: ${o.targetUid}</small></div><span class="status-badge st-${o.status}">${o.status}</span></div>`;
                 });
             });
         }
 
-        function autoDelete(path, key, elId) {
-            setTimeout(() => {
-                const el = document.getElementById(elId);
-                if(el) {
-                    el.style.opacity = '0';
-                    setTimeout(() => db.ref(`${path}/${key}`).remove(), 500);
-                }
-            }, 10000);
-        }
-
-        function payNow() {
+        function openInstamojo() {
             const amt = document.getElementById('pay-amount').value;
-            if(!amt || amt < 1) return alert("Enter amount first");
+            if (!amt) return alert("Enter amount");
             window.open('https://www.instamojo.com/@rajeshjani121/', '_blank');
         }
 
         function submitDeposit() {
             const amt = parseInt(document.getElementById('pay-amount').value);
             const utr = document.getElementById('req-utr').value;
-            if(!amt || !utr) return alert("Fill all fields");
+            if (!amt || !utr) return alert("Fill all fields");
+
             const txRef = db.ref('transactions').push();
-            txRef.set({ uid: currentUser.uid, type: 'credit', amount: amt, description: `Instamojo Deposit`, status: 'pending', timestamp: Date.now() })
+            txRef.set({ uid: currentUser.uid, type: 'credit', amount: amt, description: 'Instamojo Deposit', status: 'pending', timestamp: Date.now() })
             .then(() => {
-                db.ref('deposit_requests').push({ uid: currentUser.uid, amount: amt, utr: utr, txId: txRef.key, timestamp: Date.now() });
+                db.ref('deposit_requests').push({ uid: currentUser.uid, amount: amt, utr: utr, txId: txRef.key });
                 alert("Submitted!"); closeModal('add-money-modal');
             });
         }
@@ -286,28 +255,31 @@
         function processOrder() {
             const uid = document.getElementById('order-uid').value;
             const name = document.getElementById('order-name').value;
-            if(!uid || !name) return alert("Enter details");
+            if (!uid || !name) return alert("Fill details");
             const pr = parseInt(selectedPack.price);
-            db.ref('users/'+currentUser.uid+'/balance').transaction(curr => {
-                if((curr||0) >= pr) return curr - pr;
-                return; 
+
+            db.ref('users/' + currentUser.uid + '/balance').transaction(curr => {
+                if ((curr || 0) >= pr) return curr - pr;
+                return;
             }, (err, comm) => {
-                if(comm) {
+                if (comm) {
                     db.ref('orders').push({ placedByUid: currentUser.uid, targetUid: uid, targetName: name, diamonds: selectedPack.diamonds, price: pr, status: 'pending', timestamp: Date.now() });
-                    db.ref('transactions').push({ uid: currentUser.uid, type: 'debit', amount: pr, description: `Buy ${selectedPack.diamonds} DM`, status: 'success', timestamp: Date.now() });
+                    db.ref('transactions').push({ uid: currentUser.uid, type: 'debit', amount: pr, description: 'Buy Diamonds', status: 'success', timestamp: Date.now() });
                     alert("Order Placed!"); closeModal('purchase-modal');
-                } else alert("Insufficient Balance");
+                } else alert("Low Balance");
             });
         }
 
         function nav(id) {
-            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-            document.getElementById(id+'-page').classList.add('active');
-            document.querySelectorAll('.nav-icon').forEach(i=>i.classList.remove('active'));
-            const targetNav = Array.from(document.querySelectorAll('.nav-icon')).find(el => el.innerText.toLowerCase().includes(id));
-            if(targetNav) targetNav.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id + '-page').classList.add('active');
+            document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
         }
 
-        function contactSupport() { if(supportLink) window.open(supportLink, '_blank'); }
-        function openAddMoney() { document.getElementById('add-money-modal').style.display='block'; }
-        function closeModal(id) { document.getElementById(id
+        function contactSupport() { db.ref('settings/supportLink').once('value', s => { window.open(s.val(), '_blank'); }); }
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    </script>
+</body>
+</html>
