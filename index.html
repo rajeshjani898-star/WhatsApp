@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NativeChat Premium</title>
+    <title>NativeChat Ultimate</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -12,110 +12,107 @@
             --wa-bg: #efe7dd;
             --wa-sent: #dcf8c6;
             --wa-recv: #ffffff;
-            --font: 'Poppins', sans-serif;
+            --wa-teal: #128c7e;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: var(--font); background: #f0f2f5; height: 100vh; overflow: hidden; }
-
-        #app { width: 100%; height: 100%; position: relative; max-width: 500px; margin: 0 auto; background: #fff; display: flex; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #f0f2f5; overflow: hidden; height: 100vh; }
 
         /* HEADER */
-        .app-header { 
-            padding: 15px 20px; background: var(--primary-grad); color: white; 
-            display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10;
-        }
+        .app-header { padding: 12px 18px; background: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 100; }
+        .header-icons { display: flex; gap: 18px; color: #555; font-size: 18px; }
 
-        /* CONTENT AREA */
-        .content-area { flex: 1; overflow-y: auto; position: relative; padding-bottom: 70px; }
+        /* MAIN CONTENT AREA */
+        .content-area { height: calc(100vh - 125px); overflow-y: auto; position: relative; }
         .screen { display: none; padding: 0; height: 100%; }
         .screen.active { display: block; }
 
-        /* WHATSAPP CHAT ROOM */
+        /* WHATSAPP CHAT UI */
         #chat-room { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-color: var(--wa-bg);
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            z-index: 3000; display: none; flex-direction: column; 
+            background: var(--wa-bg) url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            z-index: 2000; display: none; flex-direction: column; 
         }
-        #messages-display { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 5px; }
+        #messages-display { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 6px; }
+        .msg { padding: 8px 12px; border-radius: 8px; font-size: 14px; max-width: 80%; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .sent { align-self: flex-end; background: var(--wa-sent); border-top-right-radius: 0; }
+        .recv { align-self: flex-start; background: #fff; border-top-left-radius: 0; }
         
-        .msg-bubble { padding: 8px 12px; border-radius: 8px; font-size: 14px; max-width: 80%; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; position: relative; }
-        .msg-sent { align-self: flex-end; background: var(--wa-sent); }
-        .msg-recv { align-self: flex-start; background: var(--wa-recv); }
-        
-        .chat-footer { padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .chat-footer { padding: 8px 10px; display: flex; align-items: center; gap: 8px; background: transparent; }
         .input-pill { flex: 1; background: white; border-radius: 25px; display: flex; align-items: center; padding: 5px 15px; gap: 10px; }
         .input-pill input { flex: 1; border: none; outline: none; padding: 10px 0; font-size: 15px; }
-        .mic-btn { width: 50px; height: 50px; background: #128c7e; color: white; border-radius: 50%; border: none; font-size: 20px; }
+        .mic-btn { width: 48px; height: 48px; background: var(--wa-teal); color: white; border-radius: 50%; border: none; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* MODAL */
+        /* MODALS (START CHAT) */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 4000; display: none; justify-content: center; align-items: center; }
         .modal-box { background: white; width: 85%; padding: 25px; border-radius: 20px; text-align: center; }
-        .toggle-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid #ddd; background: #f0f0f0; cursor: pointer; margin: 5px; }
+        .toggle-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid #ddd; background: #f0f0f0; cursor: pointer; margin: 5px; font-weight: bold; }
         .toggle-btn.active { background: var(--primary-grad); color: white; border: none; }
         
-        /* SEARCH & LISTS */
-        .chat-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; object-fit: cover; }
-
-        /* FAB */
-        .fab-add { position: fixed; bottom: 85px; right: 25px; width: 60px; height: 60px; background: var(--primary-grad); border-radius: 50%; color: white; font-size: 24px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 99; }
+        /* CALL OVERLAY */
+        #call-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        #local-video { position: absolute; top: 20px; right: 20px; width: 100px; height: 140px; border-radius: 10px; border: 2px solid white; }
 
         /* BOTTOM NAV */
-        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 65px; background: #fff; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 100; }
-        .nav-item { color: #888; font-size: 11px; text-align: center; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; }
+        .nav-item { color: #888; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
         .nav-item.active { color: #ff416c; }
-        .nav-item i { font-size: 22px; display: block; }
-        
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 2px; }
+
+        .fab-add { position: fixed; bottom: 85px; right: 25px; width: 60px; height: 60px; background: var(--primary-grad); border-radius: 50%; color: white; font-size: 24px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
         .hidden { display: none; }
-        .btn-main { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--primary-grad); color: white; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .blue-tick { color: #1da1f2; margin-left: 5px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div id="app">
+        <!-- HEADER -->
         <header class="app-header">
-            <h2>NativeChat</h2>
-            <div style="display:flex; gap:15px;"><i class="fas fa-search"></i> <i class="fas fa-ellipsis-v"></i></div>
+            <h2 style="background:var(--primary-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">NativeChat</h2>
+            <div class="header-icons"><i class="fas fa-camera"></i> <i class="fas fa-search" onclick="switchTab('search')"></i> <i class="fas fa-ellipsis-v"></i></div>
         </header>
 
         <div class="content-area">
-            <!-- CHATS TAB -->
+            <!-- CHATS SCREEN -->
             <div id="tab-chats" class="screen active">
                 <div id="chat-list"></div>
             </div>
 
-            <!-- SEARCH TAB -->
+            <!-- SEARCH SCREEN -->
             <div id="tab-search" class="screen">
                 <div style="padding:15px;">
-                    <input type="text" id="search-input" placeholder="Search by username..." onkeyup="searchUsers()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+                    <input type="text" id="search-in" placeholder="Search users..." onkeyup="searchUsers()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
                     <div id="search-results" style="margin-top:10px;"></div>
                 </div>
             </div>
 
-            <!-- PREMIUM TAB -->
+            <!-- PREMIUM SCREEN -->
             <div id="tab-premium" class="screen">
-                <div style="text-align:center; padding:40px;">
+                <div style="text-align:center; padding:50px;">
                     <i class="fas fa-crown" style="font-size:50px; color:gold;"></i>
-                    <h3>NativeChat Premium</h3>
-                    <button class="btn-main" onclick="window.open('https://www.instamojo.com/@rajeshjani121/')">Get Blue Tick</button>
+                    <h3 style="margin:15px 0;">NativeChat Premium</h3>
+                    <p style="font-size:12px; color:#666;">Unlock Blue Tick & Unlimited Messaging</p>
+                    <button onclick="window.open('https://www.instamojo.com/@rajeshjani121/')" style="width:100%; padding:15px; border-radius:30px; border:none; background:var(--primary-grad); color:white; font-weight:bold; margin-top:20px;">Upgrade Now</button>
                 </div>
             </div>
 
-            <!-- PROFILE TAB -->
+            <!-- PROFILE SCREEN -->
             <div id="tab-profile" class="screen">
                 <div style="text-align:center; padding:30px;">
-                    <img id="my-avatar" src="" class="avatar" style="width:100px; height:100px;">
+                    <img id="my-avatar" src="" class="avatar" style="width:100px; height:100px; border:3px solid #ff416c;">
                     <h2 id="my-name">User</h2>
-                    <button class="btn-main" style="background:#444;" onclick="auth.signOut().then(()=>location.reload())">Logout</button>
+                    <div id="premium-status" class="hidden" style="color:#1da1f2; font-weight:bold;"><i class="fas fa-check-circle"></i> Verified</div>
+                    <button onclick="auth.signOut().then(()=>location.reload())" style="margin-top:30px; color:red; background:none; border:none;">Logout</button>
                 </div>
             </div>
 
             <button class="fab-add" onclick="openStartChat()"><i class="fas fa-plus"></i></button>
         </div>
 
+        <!-- NAVIGATION -->
         <nav class="bottom-nav">
             <div class="nav-item active" onclick="switchTab('chats')"><i class="fas fa-comment"></i><span>Chats</span></div>
             <div class="nav-item" onclick="switchTab('search')"><i class="fas fa-search"></i><span>Search</span></div>
@@ -124,27 +121,31 @@
         </nav>
     </div>
 
-    <!-- CODE MODAL -->
+    <!-- START CHAT MODAL (JOIN/CREATE CODE) -->
     <div id="start-chat-modal" class="modal">
         <div class="modal-box">
-            <h2>Start Chat</h2>
-            <div style="margin:15px 0;">
+            <h2 style="margin-bottom:15px;">Start Chat</h2>
+            <div style="margin-bottom:20px;">
                 <button id="btn-join" class="toggle-btn active" onclick="setMode('join')">Join Code</button>
                 <button id="btn-create" class="toggle-btn" onclick="setMode('create')">Create Code</button>
             </div>
-            <input type="text" id="chat-code" placeholder="5-digit Code" maxlength="5" style="width:100%; padding:12px; text-align:center; font-size:20px; border:1px solid #ddd; border-radius:10px;">
-            <button class="btn-main" onclick="handleConnect()">Connect</button>
-            <button class="btn-main" style="background:#999;" onclick="closeStartChat()">Close</button>
+            <input type="text" id="chat-code" placeholder="5-digit Code" maxlength="5" style="width:100%; padding:15px; text-align:center; font-size:24px; border-radius:12px; border:1.5px solid #ddd; margin-bottom:20px;">
+            <button onclick="handleConnect()" style="width:100%; padding:15px; background:var(--primary-grad); color:white; border:none; border-radius:30px; font-weight:bold;">Connect</button>
+            <button onclick="closeStartChat()" style="width:100%; margin-top:10px; background:none; border:none; color:#888;">Close</button>
         </div>
     </div>
 
-    <!-- CHAT ROOM -->
+    <!-- CHAT ROOM WINDOW -->
     <div id="chat-room">
-        <header class="app-header" style="background:#fff; color:#333;">
-            <div style="display:flex; align-items:center; gap:10px;">
+        <header class="app-header">
+            <div style="display:flex; align-items:center; gap:12px;">
                 <i class="fas fa-arrow-left" onclick="hideChat()"></i>
                 <img id="room-avatar" src="" style="width:40px; height:40px; border-radius:50%;">
-                <b id="room-name">Name</b>
+                <b id="room-name">User</b>
+            </div>
+            <div class="header-icons">
+                <i class="fas fa-video" onclick="startCall('video')"></i>
+                <i class="fas fa-phone" onclick="startCall('audio')"></i>
             </div>
         </header>
         <div id="messages-display"></div>
@@ -158,15 +159,24 @@
         </div>
     </div>
 
-    <!-- AUTH -->
-    <div id="auth-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9000; display:flex; flex-direction:column; justify-content:center; padding:30px; text-align:center;">
-        <h1 style="background:var(--primary-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:20px;">NativeChat</h1>
-        <input type="email" id="email" placeholder="Email" style="padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px;">
-        <input type="password" id="pass" placeholder="Password" style="padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px;">
-        <button class="btn-main" onclick="handleAuth()">Log In / Sign Up</button>
+    <!-- CALL OVERLAY -->
+    <div id="call-overlay">
+        <video id="remote-video" autoplay playsinline></video>
+        <video id="local-video" autoplay playsinline muted></video>
+        <div style="position:absolute; bottom:50px; display:flex; gap:30px;">
+            <button onclick="endCall()" style="width:65px; height:65px; border-radius:50%; background:red; border:none; color:white; font-size:24px;"><i class="fas fa-phone-slash"></i></button>
+        </div>
     </div>
 
-    <!-- FIREBASE -->
+    <!-- LOGIN SCREEN -->
+    <div id="auth-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9000; display:flex; flex-direction:column; justify-content:center; padding:40px; text-align:center;">
+        <h1 style="background:var(--primary-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:30px;">NativeChat</h1>
+        <input type="email" id="email" placeholder="Email" style="padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;">
+        <input type="password" id="pass" placeholder="Password" style="padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;">
+        <button onclick="handleAuth()" style="width:100%; padding:15px; border-radius:30px; border:none; background:var(--primary-grad); color:white; font-weight:bold;">Log In / Sign Up</button>
+    </div>
+
+    <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -187,7 +197,7 @@
         let otherUserId = null;
         let chatMode = 'join';
 
-        // AUTH LOGIC
+        // AUTH
         function handleAuth() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
@@ -205,9 +215,12 @@
             if(user) {
                 db.ref('users/'+user.uid).on('value', s => {
                     currentUser = s.val();
+                    if(!currentUser) return;
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('my-name').innerText = currentUser.username;
                     document.getElementById('my-avatar').src = currentUser.avatar;
+                    const isPro = currentUser.premiumExpiry > Date.now();
+                    document.getElementById('premium-status').classList.toggle('hidden', !isPro);
                     loadChats();
                 });
             } else {
@@ -215,7 +228,7 @@
             }
         });
 
-        // TABS
+        // NAVIGATION
         function switchTab(tab) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('tab-'+tab).classList.add('active');
@@ -223,15 +236,33 @@
             event.currentTarget.classList.add('active');
         }
 
-        // MODAL
         function openStartChat() { document.getElementById('start-chat-modal').style.display = 'flex'; }
         function closeStartChat() { document.getElementById('start-chat-modal').style.display = 'none'; }
-        
-        function setMode(mode) {
-            chatMode = mode;
-            document.getElementById('btn-join').classList.toggle('active', mode==='join');
-            document.getElementById('btn-create').classList.toggle('active', mode==='create');
-            if(mode === 'create') {
+
+        // SEARCH
+        function searchUsers() {
+            const q = document.getElementById('search-in').value.toLowerCase();
+            const res = document.getElementById('search-results');
+            if(q.length < 2) { res.innerHTML = ''; return; }
+            db.ref('users').once('value', s => {
+                res.innerHTML = '';
+                s.forEach(child => {
+                    const u = child.val();
+                    if(u.id !== currentUser.id && u.username.toLowerCase().includes(q)) {
+                        res.innerHTML += `<div class="chat-item" style="display:flex; align-items:center; padding:15px; border-bottom:1px solid #eee;" onclick="openChat('${u.id}', '${u.username}', '${u.avatar}')">
+                            <img src="${u.avatar}" style="width:45px; height:45px; border-radius:50%; margin-right:15px;">
+                            <b>${u.username}</b></div>`;
+                    }
+                });
+            });
+        }
+
+        // JOIN/CREATE CODE
+        function setMode(m) {
+            chatMode = m;
+            document.getElementById('btn-join').classList.toggle('active', m==='join');
+            document.getElementById('btn-create').classList.toggle('active', m==='create');
+            if(m === 'create') {
                 const code = Math.floor(10000 + Math.random() * 90000);
                 document.getElementById('chat-code').value = code;
                 db.ref('temp_codes/'+code).set(currentUser.id);
@@ -252,23 +283,6 @@
             });
         }
 
-        // SEARCH
-        function searchUsers() {
-            const q = document.getElementById('search-input').value.toLowerCase();
-            const res = document.getElementById('search-results');
-            if(q.length < 2) { res.innerHTML = ''; return; }
-            db.ref('users').once('value', s => {
-                res.innerHTML = '';
-                s.forEach(child => {
-                    const u = child.val();
-                    if(u.id !== currentUser.id && u.username.toLowerCase().includes(q)) {
-                        res.innerHTML += `<div class="chat-item" onclick="openChat('${u.id}', '${u.username}', '${u.avatar}')">
-                            <img src="${u.avatar}" class="avatar"><b>${u.username}</b></div>`;
-                    }
-                });
-            });
-        }
-
         // MESSAGING
         function openChat(id, name, avatar) {
             otherUserId = id;
@@ -282,8 +296,9 @@
                 disp.innerHTML = '';
                 s.forEach(m => {
                     const msg = m.val();
+                    if(!msg) return;
                     const isMe = msg.sender === currentUser.id;
-                    disp.innerHTML += `<div class="msg-bubble ${isMe?'msg-sent':'msg-recv'}">${msg.text}</div>`;
+                    disp.innerHTML += `<div class="msg ${isMe?'sent':'recv'}">${msg.text}</div>`;
                 });
                 disp.scrollTop = disp.scrollHeight;
             });
@@ -304,14 +319,33 @@
             db.ref('user_chats/'+currentUser.id).on('value', s => {
                 const list = document.getElementById('chat-list');
                 list.innerHTML = '';
+                if(!s.exists()) return;
                 s.forEach(c => {
                     const chat = c.val();
-                    list.innerHTML += `<div class="chat-item" onclick="openChat('${c.key}', '${chat.name}', '${chat.avatar}')">
-                        <img src="${chat.avatar}" class="avatar">
-                        <div><b>${chat.name}</b><br><small>${chat.last}</small></div>
+                    list.innerHTML += `<div style="display:flex; align-items:center; padding:15px; border-bottom:1px solid #eee;" onclick="openChat('${c.key}', '${chat.name}', '${chat.avatar}')">
+                        <img src="${chat.avatar}" style="width:50px; height:50px; border-radius:50%; margin-right:15px;">
+                        <div style="flex:1;"><b>${chat.name}</b><br><small style="color:#888;">${chat.last}</small></div>
                     </div>`;
                 });
             });
+        }
+
+        // VIDEO CALL LOGIC
+        async function startCall(type) {
+            document.getElementById('call-overlay').style.display = 'flex';
+            db.ref('calls/' + otherUserId).set({
+                callerId: currentUser.id,
+                callerName: currentUser.username,
+                status: 'calling'
+            });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: type==='video', audio: true });
+            document.getElementById('local-video').srcObject = stream;
+        }
+
+        function endCall() {
+            document.getElementById('call-overlay').style.display = 'none';
+            db.ref('calls/'+otherUserId).remove();
+            location.reload(); 
         }
 
         // Icon Toggle
@@ -320,4 +354,4 @@
         };
     </script>
 </body>
-</html>
+            </html>
