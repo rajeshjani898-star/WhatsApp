@@ -3,161 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FF Store - Topup</title>
+    <title>FF Store - Premium Topup</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root { --primary: #6200EA; --secondary: #311B92; --bg: #F0F4F8; --white: #FFFFFF; --text: #333; --green: #00C853; }
+        :root { --primary: #2196F3; --secondary: #1976D2; --bg: #F8FAFC; --white: #FFFFFF; --text: #1E293B; --green: #10B981; --border: #E2E8F0; --instamojo: #733dfa; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
 
-        /* Auth Screen */
-        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--white); z-index: 2000; padding: 30px; display: flex; flex-direction: column; justify-content: center; }
-        .input-box { width: 100%; padding: 15px; background: #F5F5F5; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd; outline: none; }
-        .btn-main { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 600; width: 100%; margin-top: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(98, 0, 234, 0.3); }
-
-        /* Header */
-        .app-header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 100; }
-        .header-balance { background: #EDE7F6; color: var(--primary); padding: 5px 12px; border-radius: 20px; font-weight: 600; cursor: pointer; }
-
-        /* Banner Slider */
-        .banner-container { width: 100%; height: 160px; overflow: hidden; position: relative; margin-bottom: 15px; background: #eee; }
-        .banner-wrapper { display: flex; transition: transform 0.5s ease-in-out; height: 100%; }
+        .banner-container { width: 100%; height: 180px; overflow: hidden; position: relative; background: #eee; margin-bottom: 5px; }
+        .banner-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
         .banner-slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; }
-        .slider-dots { position: absolute; bottom: 10px; width: 100%; text-align: center; }
-        .dot { height: 8px; width: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; display: inline-block; margin: 0 4px; }
-        .dot.active { background: white; transform: scale(1.2); }
+        .slider-dots { position: absolute; bottom: 12px; width: 100%; text-align: center; }
+        .dot { height: 6px; width: 6px; background: rgba(255,255,255,0.4); border-radius: 50%; display: inline-block; margin: 0 4px; transition: 0.3s; }
+        .dot.active { background: var(--white); width: 18px; border-radius: 10px; }
 
-        /* Grid & Cards */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px; }
-        .pkg-card { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; }
-        .pkg-card:active { transform: scale(0.95); }
-        .pkg-amt { font-size: 18px; font-weight: 700; color: var(--primary); }
-        .pkg-price { font-size: 14px; color: #666; }
+        #auth-screen { position: fixed; inset: 0; background: var(--white); z-index: 2000; padding: 30px; display: flex; flex-direction: column; justify-content: center; }
+        .input-box { width: 100%; padding: 14px 18px; background: #F1F5F9; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); outline: none; transition: 0.3s; font-size: 14px; }
+        .input-box:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1); }
+        .btn-main { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3); }
+        
+        .app-header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .header-balance { background: #EFF6FF; color: var(--primary); padding: 6px 14px; border-radius: 50px; font-weight: 700; font-size: 14px; border: 1px solid #DBEAFE; }
 
-        /* Wallet Card */
-        .wallet-card { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; margin: 20px; padding: 25px; border-radius: 20px; text-align: center; }
-        .wallet-amount { font-size: 32px; font-weight: 700; margin: 10px 0; }
+        .wallet-card { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; margin: 15px; padding: 25px; border-radius: 24px; position: relative; overflow: hidden; }
+        .wallet-amount { font-size: 32px; font-weight: 700; margin: 5px 0 15px; }
 
-        /* Lists */
-        .list-container { padding: 0 20px; }
-        .list-item { background: var(--white); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; animation: fadeIn 0.4s; }
-        .list-title { font-weight: 600; font-size: 14px; }
-        .list-sub { font-size: 11px; color: #888; }
-        .status-badge { font-size: 10px; padding: 4px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
-        .st-pending { background: #FFF3E0; color: #FF9800; }
-        .st-success, .st-completed { background: #E8F5E9; color: #4CAF50; }
-        .st-rejected { background: #FFEBEE; color: #F44336; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+        .pkg-card { background: var(--white); padding: 20px 15px; border-radius: 18px; text-align: center; border: 1px solid var(--border); transition: 0.3s; }
+        .pkg-amt { font-weight: 700; font-size: 18px; color: var(--text); display: block; }
+        .pkg-price { color: var(--primary); font-weight: 600; font-size: 14px; margin-top: 4px; }
 
-        /* Navigation */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 100; }
-        .nav-icon { text-align: center; color: #9E9E9E; font-size: 10px; cursor: pointer; flex: 1; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 100; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+        .nav-icon { text-align: center; color: #94A3B8; font-size: 10px; font-weight: 500; flex: 1; }
         .nav-icon.active { color: var(--primary); }
         .nav-icon i { font-size: 20px; margin-bottom: 4px; display: block; }
 
-        .page { display: none; }
+        .list-item { background: var(--white); padding: 15px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 1px solid var(--border); transition: 0.5s; }
+        .status-badge { font-size: 10px; padding: 4px 10px; border-radius: 6px; font-weight: 700; text-transform: uppercase; }
+        .st-pending { color: #D97706; background: #FEF3C7; }
+        .st-success, .st-completed { color: #059669; background: #D1FAE5; }
+        .st-rejected { color: #DC2626; background: #FEE2E2; }
+
+        .modal-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; overflow-y: auto; display: none; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .page { display: none; padding-top: 10px; }
         .page.active { display: block; }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; display: none; overflow-y: auto; }
-        .modal-header { background: white; padding: 20px; display: flex; align-items: center; gap: 15px; font-weight: 600; }
-        .modal-body { padding: 20px; }
-        .detail-box { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- AUTHENTICATION -->
     <div id="auth-screen">
-        <h2 style="text-align:center; color: var(--primary); margin-bottom: 10px;"><i class="fa-solid fa-bolt"></i> FF STORE</h2>
-        <p style="text-align:center; font-size: 12px; color: #666; margin-bottom: 30px;">Login or create an account to start</p>
+        <div style="text-align:center; margin-bottom: 40px;">
+            <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: white; font-size: 30px; box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);"><i class="fa-solid fa-bolt"></i></div>
+            <h2 style="font-weight: 700;">FF Store</h2>
+            <p style="color: #64748B; font-size: 14px;">Login to start your Topup</p>
+        </div>
         <input type="email" id="login-email" class="input-box" placeholder="Email Address">
         <input type="password" id="login-pass" class="input-box" placeholder="Password">
-        <button class="btn-main" onclick="handleAuth()">Login / Register</button>
+        <button class="btn-main" onclick="handleAuth()">Continue</button>
     </div>
 
     <div id="main-app" style="display: none;">
         <div class="app-header">
-            <div style="font-weight:700; color: var(--primary);">FF Store</div>
+            <div style="font-weight:800; font-size: 18px; color: var(--primary);">FF STORE</div>
             <div class="header-balance" onclick="nav('wallet')"><i class="fa-solid fa-wallet"></i> ₹<span id="header-bal-amt">0</span></div>
         </div>
 
-        <!-- PAGE: HOME -->
         <div id="home-page" class="page active">
             <div class="banner-container">
                 <div class="banner-wrapper" id="banner-track"></div>
                 <div class="slider-dots" id="banner-dots"></div>
             </div>
-            <h3 style="padding: 0 20px; margin-bottom: 15px; font-size: 16px;">Topup Diamonds</h3>
-            <div class="grid" id="packages-grid">Loading Packages...</div>
+            <h3 style="padding: 15px 20px 10px; font-weight: 700;">Topup Diamonds</h3>
+            <div class="grid" id="packages-grid"></div>
         </div>
 
-        <!-- PAGE: WALLET -->
         <div id="wallet-page" class="page">
             <div class="wallet-card">
-                <div style="font-size: 12px; opacity: 0.8;">Available Balance</div>
+                <div style="font-size: 13px; opacity: 0.8;">Available Balance</div>
                 <div class="wallet-amount">₹<span id="main-bal-amt">0</span></div>
-                <button class="btn-main" onclick="openAddMoney()" style="background: rgba(255,255,255,0.2); width: auto; padding: 8px 25px; box-shadow: none;">+ Add Money</button>
+                <button onclick="openAddMoney()" style="background: white; color: var(--text); border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 13px;">+ Add Money</button>
             </div>
-            <h4 style="padding: 0 20px; margin-bottom: 10px; font-size: 14px;">Recent Transactions</h4>
-            <div class="list-container" id="trans-list"></div>
+            <h4 style="padding: 0 20px 10px;">Transactions History</h4>
+            <div class="list-container" id="trans-list" style="padding: 0 15px;"></div>
         </div>
 
-        <!-- PAGE: PROFILE -->
         <div id="profile-page" class="page">
-            <div class="detail-box" style="margin: 20px; text-align: center;">
-                <div style="width:60px; height:60px; background:#F3E5F5; color:var(--primary); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:24px;"><i class="fa-solid fa-user"></i></div>
-                <div id="disp-email" style="font-weight:600;">User</div>
-                <button class="btn-main" onclick="contactSupport()" style="background: #25D366; font-size: 14px;"><i class="fa-brands fa-whatsapp"></i> Support</button>
-                <button class="btn-main" onclick="auth.signOut()" style="background: #fdeaea; color: #d32f2f; box-shadow: none; font-size: 13px;">Logout</button>
+            <div style="background: white; margin: 15px; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid var(--border);">
+                <div style="width:60px; height:60px; background:#F1F5F9; border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:24px;"><i class="fa-solid fa-circle-user"></i></div>
+                <h3 id="disp-email" style="font-size:14px; margin-bottom: 15px;">User</h3>
+                <button class="btn-main" onclick="contactSupport()" style="background: #25D366; font-size: 13px;"><i class="fa-brands fa-whatsapp"></i> WhatsApp Support</button>
+                <button class="btn-main" onclick="auth.signOut()" style="background: #F1F5F9; color: #EF4444; box-shadow: none; font-size: 13px; margin-top:10px;">Logout</button>
             </div>
-            <h4 style="padding: 0 20px; margin-bottom: 10px; font-size: 14px;">Order History</h4>
-            <div class="list-container" id="order-history"></div>
+            <h4 style="padding: 0 20px 10px;">Order History</h4>
+            <div class="list-container" id="order-history" style="padding: 0 15px;"></div>
         </div>
 
         <div class="bottom-nav">
-            <div class="nav-icon active" onclick="nav('home', this)"><i class="fa-solid fa-house"></i>Home</div>
-            <div class="nav-icon" onclick="nav('wallet', this)"><i class="fa-solid fa-wallet"></i>Wallet</div>
-            <div class="nav-icon" onclick="nav('profile', this)"><i class="fa-solid fa-user"></i>Profile</div>
+            <div class="nav-icon active" onclick="nav('home')"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="nav-icon" onclick="nav('wallet')"><i class="fa-solid fa-wallet"></i>Wallet</div>
+            <div class="nav-icon" onclick="nav('profile')"><i class="fa-solid fa-clock-rotate-left"></i>Orders</div>
         </div>
     </div>
 
-    <!-- MODAL: ADD MONEY (Instamojo Integrated) -->
+    <!-- ADD MONEY MODAL (Instamojo Integrated) -->
     <div id="add-money-modal" class="modal-overlay">
-        <div class="modal-header"><i class="fa-solid fa-arrow-left" onclick="closeModal('add-money-modal')"></i> Add Money</div>
-        <div class="modal-body">
-            <div class="detail-box" style="text-align: center;">
-                <p style="font-size:12px; color:#666; margin-bottom:15px;">1. Enter amount and pay via Instamojo</p>
-                <input type="number" id="pay-amount" class="input-box" placeholder="Enter Amount (₹)">
-                <button class="btn-main" onclick="payNow()" style="background:#71277a;"><i class="fa-solid fa-external-link"></i> Pay via Instamojo</button>
+        <div style="padding: 20px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
+            <i class="fa-solid fa-chevron-left" onclick="closeModal('add-money-modal')"></i>
+            <span style="font-weight: 700;">Deposit via Instamojo</span>
+        </div>
+        <div style="padding: 20px;">
+            <div style="background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px;">
+                <label style="font-size: 12px; color: #64748B; margin-bottom: 8px; display: block;">Step 1: Pay using the link</label>
+                <input type="number" id="pay-amount" class="input-box" placeholder="₹ Enter Amount">
+                <button class="btn-main" onclick="payNow()" style="background: var(--instamojo);"><i class="fa-solid fa-credit-card"></i> Open Instamojo Payment</button>
             </div>
-            <div class="detail-box">
-                <p style="font-size:12px; color:#666; margin-bottom:10px;">2. Paste Transaction ID / UTR below</p>
-                <input type="text" id="req-utr" class="input-box" placeholder="Transaction ID">
+            <div style="background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border);">
+                <label style="font-size: 12px; color: #64748B; margin-bottom: 8px; display: block;">Step 2: Enter Instamojo Payment ID</label>
+                <input type="text" id="req-utr" class="input-box" placeholder="Ex: MOJO1234...">
                 <button class="btn-main" onclick="submitDeposit()">Submit for Approval</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: PURCHASE -->
     <div id="purchase-modal" class="modal-overlay">
-        <div class="modal-header"><i class="fa-solid fa-arrow-left" onclick="closeModal('purchase-modal')"></i> Checkout</div>
-        <div class="modal-body">
-            <div class="detail-box" style="text-align: center;">
-                <h3 id="buy-pkg-title">0 Diamonds</h3>
-                <h2 id="buy-pkg-price" style="color:var(--primary);">₹0</h2>
+        <div style="padding: 20px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
+            <i class="fa-solid fa-chevron-left" onclick="closeModal('purchase-modal')"></i>
+            <span style="font-weight: 700;">Confirm Order</span>
+        </div>
+        <div style="padding: 20px;">
+            <div style="background: white; padding: 30px 20px; border-radius: 20px; text-align: center; border: 1px solid var(--border); margin-bottom: 20px;">
+                <h2 id="buy-pkg-title">...</h2>
+                <h1 style="color: var(--primary); font-size: 32px; margin: 5px 0;" id="buy-pkg-price">...</h1>
             </div>
-            <div class="detail-box">
-                <input type="text" id="order-uid" class="input-box" placeholder="Player UID">
-                <input type="text" id="order-name" class="input-box" placeholder="Game Nickname">
-                <button class="btn-main" onclick="processOrder()">Confirm Purchase</button>
-            </div>
+            <input type="text" id="order-uid" class="input-box" placeholder="Game Player UID">
+            <input type="text" id="order-name" class="input-box" placeholder="Game Name">
+            <button class="btn-main" onclick="processOrder()">Confirm Purchase</button>
         </div>
     </div>
 
-    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -170,7 +155,8 @@
             projectId: "tournament-62f77",
             storageBucket: "tournament-62f77.firebasestorage.app",
             messagingSenderId: "59905181993",
-            appId: "1:59905181993:web:8ad4f721ac50c09c478f38"
+            appId: "1:59905181993:web:8ad4f721ac50c09c478f38",
+            measurementId: "G-QHHJ1BJWMP"
         };
         
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -181,7 +167,6 @@
         let selectedPack = null;
         let supportLink = "";
 
-        // AUTH LOGIC
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
@@ -198,44 +183,33 @@
         function handleAuth() {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
-            if(!e || !p) return alert("Enter details");
-            
+            if(!e || p.length < 6) return alert("Enter valid credentials (min 6 chars)");
             auth.signInWithEmailAndPassword(e, p).catch(() => {
                 auth.createUserWithEmailAndPassword(e, p).then(creds => {
-                    db.ref('users/'+creds.user.uid).set({ balance: 0, email: e });
+                    db.ref('users/'+creds.user.uid).set({ balance: 0, email: e, name: 'User' });
                 }).catch(err => alert(err.message));
             });
         }
 
-        // NAVIGATION
-        function nav(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id + '-page').classList.add('active');
-            document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
-            if(el) el.classList.add('active');
-        }
-
         function loadData() {
-            // Balance
             db.ref('users/'+currentUser.uid+'/balance').on('value', s => {
                 const b = s.val() || 0;
                 document.getElementById('header-bal-amt').innerText = b;
                 document.getElementById('main-bal-amt').innerText = b;
             });
 
-            // Packages
             db.ref('packages').on('value', s => {
                 const g = document.getElementById('packages-grid'); g.innerHTML = '';
                 s.forEach(c => {
                     const p = c.val();
                     const div = document.createElement('div');
                     div.className = 'pkg-card';
-                    div.innerHTML = `<i class="fa-regular fa-gem" style="color:#03A9F4; font-size:20px;"></i><div class="pkg-amt">${p.diamonds} DM</div><div class="pkg-price">₹${p.price}</div>`;
+                    div.innerHTML = `<i class="fa-regular fa-gem" style="color:#00BCD4; font-size:20px; margin-bottom:8px;"></i><span class="pkg-amt">${p.diamonds} DM</span><span class="pkg-price">₹${p.price}</span>`;
                     div.onclick = () => { 
                         selectedPack = p; 
-                        document.getElementById('purchase-modal').style.display='block';
-                        document.getElementById('buy-pkg-title').innerText = p.diamonds + " Diamonds";
-                        document.getElementById('buy-pkg-price').innerText = "₹" + p.price;
+                        document.getElementById('purchase-modal').style.display='block'; 
+                        document.getElementById('buy-pkg-title').innerText = p.diamonds+" Diamonds"; 
+                        document.getElementById('buy-pkg-price').innerText = "₹"+p.price; 
                     };
                     g.appendChild(div);
                 });
@@ -248,102 +222,92 @@
         }
 
         function loadHistory() {
-            // Transaction History
             db.ref('transactions').orderByChild('uid').equalTo(currentUser.uid).on('value', snap => {
-                const l = document.getElementById('trans-list'); l.innerHTML = '';
-                let items = [];
-                snap.forEach(c => { items.push({key: c.key, ...c.val()}); });
-                items.reverse().forEach(t => {
-                    const badge = `<span class="status-badge st-${t.status}">${t.status}</span>`;
-                    l.innerHTML += `<div class="list-item" id="tx-${t.key}">
-                        <div><div class="list-title">${t.description}</div><div class="list-sub">ID: ${t.key.substring(0,8)}</div></div>
-                        <div style="text-align:right;"><div class="list-title">₹${t.amount}</div>${badge}</div>
+                const l = document.getElementById('trans-list'); l.innerHTML='';
+                let items = []; snap.forEach(c => items.push({key: c.key, ...c.val()}));
+                items.sort((a,b) => b.timestamp - a.timestamp).forEach(t => {
+                    l.innerHTML += `
+                    <div class="list-item" id="tx-${t.key}">
+                        <div>
+                            <div style="font-size:13px; font-weight:600;">${t.description}</div>
+                            <div style="font-size:10px; color:#94A3B8;">${new Date(t.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-weight:700; color:${t.type=='credit'?'#10B981':'#EF4444'}">₹${t.amount}</div>
+                            <span class="status-badge st-${t.status}">${t.status}</span>
+                        </div>
                     </div>`;
-                    
-                    if(t.status === 'success' || t.status === 'rejected') {
-                        setTimeout(() => { db.ref('transactions/'+t.key).remove(); }, 5000);
-                    }
+                    if(t.status !== 'pending') autoDelete('transactions', t.key, `tx-${t.key}`);
                 });
             });
 
-            // Order History
             db.ref('orders').orderByChild('placedByUid').equalTo(currentUser.uid).on('value', snap => {
-                const l = document.getElementById('order-history'); l.innerHTML = '';
-                let items = [];
-                snap.forEach(c => { items.push({key: c.key, ...c.val()}); });
-                items.reverse().forEach(o => {
-                    l.innerHTML += `<div class="list-item">
-                        <div><div class="list-title">${o.diamonds} Diamonds</div><div class="list-sub">UID: ${o.targetUid}</div></div>
-                        <div><span class="status-badge st-${o.status}">${o.status}</span></div>
+                const l = document.getElementById('order-history'); l.innerHTML='';
+                let items = []; snap.forEach(c => items.push({key: c.key, ...c.val()}));
+                items.sort((a,b) => b.timestamp - a.timestamp).forEach(o => {
+                    l.innerHTML += `
+                    <div class="list-item" id="ord-${o.key}">
+                        <div><div style="font-size:13px; font-weight:600;">${o.diamonds} DM</div><div style="font-size:10px; color:#94A3B8;">UID: ${o.targetUid}</div></div>
+                        <span class="status-badge st-${o.status}">${o.status}</span>
                     </div>`;
-                    if(o.status === 'completed' || o.status === 'rejected') {
-                        setTimeout(() => { db.ref('orders/'+o.key).remove(); }, 5000);
-                    }
+                    if(o.status !== 'pending') autoDelete('orders', o.key, `ord-${o.key}`);
                 });
             });
         }
 
-        // PAYMENTS
+        function autoDelete(path, key, elId) {
+            setTimeout(() => {
+                const el = document.getElementById(elId);
+                if(el) {
+                    el.style.opacity = '0';
+                    setTimeout(() => db.ref(`${path}/${key}`).remove(), 500);
+                }
+            }, 10000);
+        }
+
         function payNow() {
             const amt = document.getElementById('pay-amount').value;
-            if(!amt || amt < 1) return alert("Enter amount");
-            window.open("https://www.instamojo.com/@rajeshjani121/", "_blank");
-            alert("Please pay ₹"+amt+" on Instamojo and copy the Transaction ID.");
+            if(!amt || amt < 1) return alert("Enter amount first");
+            window.open('https://www.instamojo.com/@rajeshjani121/', '_blank');
         }
 
         function submitDeposit() {
-            const amt = document.getElementById('pay-amount').value;
+            const amt = parseInt(document.getElementById('pay-amount').value);
             const utr = document.getElementById('req-utr').value;
             if(!amt || !utr) return alert("Fill all fields");
-
-            const txId = db.ref('transactions').push().key;
-            db.ref('transactions/'+txId).set({
-                uid: currentUser.uid, type: 'credit', amount: amt, 
-                description: 'Wallet Topup', status: 'pending', timestamp: Date.now()
+            const txRef = db.ref('transactions').push();
+            txRef.set({ uid: currentUser.uid, type: 'credit', amount: amt, description: `Instamojo Deposit`, status: 'pending', timestamp: Date.now() })
+            .then(() => {
+                db.ref('deposit_requests').push({ uid: currentUser.uid, amount: amt, utr: utr, txId: txRef.key, timestamp: Date.now() });
+                alert("Submitted!"); closeModal('add-money-modal');
             });
-            db.ref('deposit_requests/'+txId).set({
-                uid: currentUser.uid, amount: amt, utr: utr, txId: txId, timestamp: Date.now()
-            });
-
-            alert("Request Sent!"); closeModal('add-money-modal');
         }
 
         function processOrder() {
             const uid = document.getElementById('order-uid').value;
             const name = document.getElementById('order-name').value;
             if(!uid || !name) return alert("Enter details");
-
+            const pr = parseInt(selectedPack.price);
             db.ref('users/'+currentUser.uid+'/balance').transaction(curr => {
-                if((curr||0) >= selectedPack.price) return curr - selectedPack.price;
-                return;
+                if((curr||0) >= pr) return curr - pr;
+                return; 
             }, (err, comm) => {
                 if(comm) {
-                    db.ref('orders').push({
-                        placedByUid: currentUser.uid, targetUid: uid, targetName: name,
-                        diamonds: selectedPack.diamonds, price: selectedPack.price, status: 'pending', timestamp: Date.now()
-                    });
+                    db.ref('orders').push({ placedByUid: currentUser.uid, targetUid: uid, targetName: name, diamonds: selectedPack.diamonds, price: pr, status: 'pending', timestamp: Date.now() });
+                    db.ref('transactions').push({ uid: currentUser.uid, type: 'debit', amount: pr, description: `Buy ${selectedPack.diamonds} DM`, status: 'success', timestamp: Date.now() });
                     alert("Order Placed!"); closeModal('purchase-modal');
                 } else alert("Insufficient Balance");
             });
         }
 
-        function openAddMoney() { document.getElementById('add-money-modal').style.display='block'; }
-        function closeModal(id) { document.getElementById(id).style.display='none'; }
-        function contactSupport() { if(supportLink) window.open(supportLink); else alert("Support unavailable"); }
+        function nav(id) {
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            document.getElementById(id+'-page').classList.add('active');
+            document.querySelectorAll('.nav-icon').forEach(i=>i.classList.remove('active'));
+            const targetNav = Array.from(document.querySelectorAll('.nav-icon')).find(el => el.innerText.toLowerCase().includes(id));
+            if(targetNav) targetNav.classList.add('active');
+        }
 
-        function initBannerSlider() {
-            db.ref('banners').on('value', snap => {
-                const track = document.getElementById('banner-track');
-                const dots = document.getElementById('banner-dots');
-                track.innerHTML = ''; dots.innerHTML = '';
-                const banners = []; snap.forEach(c => banners.push(c.val().url));
-                if(banners.length === 0) return;
-                banners.forEach((url, i) => {
-                    const slide = document.createElement('div'); slide.className = 'banner-slide'; slide.style.backgroundImage = `url('${url}')`; track.appendChild(slide);
-                    const dot = document.createElement('span'); dot.className = i===0 ? 'dot active' : 'dot'; dots.appendChild(dot);
-                });
-                let idx = 0; setInterval(() => {
-                    idx = (idx + 1) % banners.length;
-                    track.style.transform = `translateX(-${idx * 100}%)`;
-                    Array.from(dots.children).forEach((d, i) => d.className = i===idx ? 'dot active' : 'dot');
-                
+        function contactSupport() { if(supportLink) window.open(supportLink, '_blank'); }
+        function openAddMoney() { document.getElementById('add-money-modal').style.display='block'; }
+        function closeModal(id) { document.getElementById(id
