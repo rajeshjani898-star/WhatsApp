@@ -3,283 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FF Store - Topup App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>NeonTrade Mobile - Green Protocol</title>
+    
+    <!-- External Assets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
     <style>
-        :root { --primary: #2196F3; --bg: #F8FAFC; --white: #FFFFFF; --text: #1E293B; --border: #E2E8F0; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+        :root {
+            --neon-green: #00ff55;
+            --neon-lime: #ccff00;
+            --dark-bg: #000000;
+            --glass: rgba(0, 255, 85, 0.08);
+            --border: rgba(0, 255, 85, 0.3);
+        }
 
-        /* Auth Screen */
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 2000; padding: 30px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
-        .input-box { width: 100%; padding: 14px; background: #F1F5F9; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); outline: none; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; }
+        body {
+            background-color: var(--dark-bg);
+            background-image: radial-gradient(circle at top right, #0a200a, #000);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 80px; /* Increased for 4 nav items */
+            overflow-x: hidden;
+        }
 
-        /* App UI */
-        .app-header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .header-balance { background: #EFF6FF; color: var(--primary); padding: 6px 14px; border-radius: 50px; font-weight: 700; font-size: 14px; }
+        .rajdhani { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; }
+        
+        /* Glassmorphism Components */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
 
-        .banner-container { width: 100%; height: 160px; overflow: hidden; position: relative; margin-top: 5px; }
-        .banner-wrapper { display: flex; transition: 0.5s; height: 100%; }
-        .banner-slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; }
+        .neon-text { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 85, 0.5); }
+        .neon-btn-buy { background: var(--neon-green); color: #000; font-weight: 700; border: none; }
+        .neon-btn-sell { background: #ff3333; color: #fff; font-weight: 700; border: none; }
 
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
-        .pkg-card { background: white; padding: 20px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
-        .pkg-amt { font-weight: 700; font-size: 18px; display: block; }
-        .pkg-price { color: var(--primary); font-weight: 600; font-size: 14px; }
+        /* Mobile Chart Height */
+        #chart-wrapper { height: 280px; width: 100%; position: relative; }
+        /* Navigation Bar */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .nav-item { color: #555; text-decoration: none; text-align: center; font-size: 0.65rem; transition: 0.2s; }
+        .nav-item.active { color: var(--neon-green); transform: translateY(-2px); }
+        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 2px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 100; }
-        .nav-icon { text-align: center; color: #94A3B8; font-size: 10px; flex: 1; }
-        .nav-icon.active { color: var(--primary); }
-        .nav-icon i { font-size: 20px; display: block; margin-bottom: 4px; }
+        /* Loading Overlay */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .list-item { background: white; padding: 15px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin: 0 15px 10px; border: 1px solid var(--border); }
-        .status-badge { font-size: 10px; padding: 4px 8px; border-radius: 5px; font-weight: 700; text-transform: uppercase; }
-        .st-pending { color: #D97706; background: #FEF3C7; }
-        .st-success { color: #059669; background: #D1FAE5; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .modal { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: none; overflow-y: auto; }
-        .page { display: none; }
-        .page.active { display: block; }
+        /* Wallet Specifics */
+        .balance-card { border-left: 5px solid var(--neon-green); }
+        .step-num { 
+            width: 25px; height: 25px; background: var(--neon-green); color: #000; 
+            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+            font-weight: bold; margin-right: 10px; font-size: 0.8rem;
+        }
+        
+        /* Modal Styling */
+        .modal-content {
+            background: linear-gradient(145deg, #0a0a0a, #000);
+            border: 1px solid var(--border);
+            box-shadow: 0 0 30px rgba(0, 255, 85, 0.15);
+        }
+        .modal-header { border-bottom: 1px solid var(--border); }        .nav-link { font-size: 0.85rem; transition: all 0.2s; }
+        .nav-link.active { background: var(--neon-green) !important; color: #000 !important; font-weight: 600; }
+        
+        /* Transaction History */
+        #tx-history::-webkit-scrollbar { width: 4px; }
+        #tx-history::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        /* Profile Specifics */
+        .profile-avatar {
+            width: 80px; height: 80px;
+            background: linear-gradient(45deg, #004d00, #00ff55);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: #000; font-weight: bold;
+            margin: 0 auto 15px;
+            border: 2px solid #fff;
+            box-shadow: 0 0 20px rgba(0,255,85,0.4);
+        }
+        .setting-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .setting-row:last-child { border-bottom: none; }
+        .toggle-switch {
+            width: 40px; height: 20px; background: #333; border-radius: 20px;
+            position: relative; cursor: pointer; transition: 0.3s;
+        }
+        .toggle-switch.on { background: var(--neon-green); }
+        .toggle-switch::after {
+            content:''; position: absolute; left: 2px; top: 2px;
+            width: 16px; height: 16px; background: #fff; border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle-switch.on::after { left: 22px; }
+        
+        .kyc-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 0.7rem; font-weight: bold; text-transform: uppercase;
+        }
+        .kyc-verified { background: rgba(0,255,85,0.2); color: var(--neon-green); border: 1px solid var(--neon-green); }
+        .kyc-pending { background: rgba(255,165,0,0.2); color: orange; border: 1px solid orange; }
     </style>
 </head>
 <body>
 
-    <!-- Login Screen -->
-    <div id="auth-screen">
-        <h2 style="margin-bottom: 10px; color: var(--primary);">FF Store Login</h2>
-        <p style="margin-bottom: 30px; color: #64748B;">Enter your email to continue</p>
-        <input type="email" id="login-email" class="input-box" placeholder="Email Address">
-        <input type="password" id="login-pass" class="input-box" placeholder="Password (min 6 chars)">
-        <button class="btn-main" onclick="handleAuth()">Login / Register</button>
+    <!-- Startup Animation -->
+    <div id="loading-screen">
+        <div class="spinner-border text-success mb-3" role="status"></div>
+        <h2 class="rajdhani neon-text">NEON TRADE</h2>
+        <span class="text-secondary small">SECURE PROTOCOL V7.1</span>    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border border-success">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title rajdhani neon-text">NEON ACCESS</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Tabs -->
+            <ul class="nav nav-pills nav-fill mb-3" id="authTabs">
+              <li class="nav-item">
+                <button class="nav-link active bg-dark text-success border border-success rounded-0" data-bs-toggle="pill" data-bs-target="#signin">Sign In</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link bg-dark text-secondary border border-secondary rounded-0" data-bs-toggle="pill" data-bs-target="#signup">Register</button>
+              </li>
+            </ul>
+            
+            <div class="tab-content">
+              <!-- Sign In Form -->
+              <div class="tab-pane fade show active" id="signin">
+                <input type="text" id="signin-id" class="form-control bg-dark text-white border-secondary mb-2" placeholder="User ID / Email">
+                <input type="password" id="signin-pass" class="form-control bg-dark text-white border-secondary mb-3" placeholder="Password">
+                <button class="btn neon-btn-buy w-100" onclick="handleSignIn()">ACCESS ACCOUNT</button>
+                <small class="text-secondary d-block text-center mt-2"><a href="#" class="text-success">Forgot ID?</a></small>
+              </div>
+              
+              <!-- Register Form -->
+              <div class="tab-pane fade" id="signup">
+                <input type="text" id="signup-name" class="form-control bg-dark text-white border-secondary mb-2" placeholder="Full Name">
+                <input type="email" id="signup-email" class="form-control bg-dark text-white border-secondary mb-2" placeholder="Email">
+                <input type="password" id="signup-pass" class="form-control bg-dark text-white border-secondary mb-2" placeholder="Create Password">
+                <small class="text-secondary d-block mb-2" style="font-size:0.65rem">By registering, you agree to the <a href="#" class="text-success">Green Protocol Terms</a></small>
+                <button class="btn btn-outline-success w-100" onclick="handleSignUp()">CREATE ACCOUNT</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Main App UI -->
-    <div id="main-app" style="display: none;">
-        <div class="app-header">
-            <div style="font-weight:800; color: var(--primary);">FF STORE</div>
-            <div class="header-balance" onclick="nav('wallet')"><i class="fa-solid fa-wallet"></i> ₹<span id="header-bal-amt">0</span></div>
-        </div>
-
-        <!-- HOME -->
-        <div id="home-page" class="page active">
-            <div class="banner-container">
-                <div class="banner-wrapper" id="banner-track"></div>
-            </div>
-            <h4 style="margin: 20px 15px 10px;">Select Diamond Pack</h4>
-            <div class="grid" id="packages-grid"></div>
-        </div>
-
-        <!-- WALLET -->
-        <div id="wallet-page" class="page">
-            <div style="background: #1e293b; color: white; margin: 15px; padding: 25px; border-radius: 20px;">
-                <p style="font-size: 12px; opacity: 0.7;">Current Balance</p>
-                <h1 style="font-size: 32px; margin: 5px 0;">₹<span id="main-bal-amt">0</span></h1>
-                <button onclick="openModal('add-money-modal')" style="background: var(--primary); border:none; color:white; padding:8px 15px; border-radius:10px; margin-top:10px; font-weight:600;">+ Add Money</button>
-            </div>
-            <h4 style="margin: 20px 15px 10px;">Transaction History</h4>
-            <div id="trans-list"></div>
-        </div>
-
-        <!-- PROFILE / ORDERS -->
-        <div id="profile-page" class="page">
-            <div style="background: white; margin: 15px; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid var(--border);">
-                <p id="disp-email" style="font-weight: 600; margin-bottom: 10px;">User</p>
-                <button class="btn-main" style="background: #25D366; font-size: 13px;" onclick="contactSupport()"><i class="fa-brands fa-whatsapp"></i> WhatsApp Support</button>
-                <p onclick="auth.signOut()" style="color:red; margin-top:15px; font-size:13px; font-weight:600;">Logout Account</p>
-            </div>
-            <h4 style="margin: 20px 15px 10px;">My Orders</h4>
-            <div id="order-history"></div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-icon active" onclick="nav('home')"><i class="fa-solid fa-house"></i>Home</div>
-            <div class="nav-icon" onclick="nav('wallet')"><i class="fa-solid fa-wallet"></i>Wallet</div>
-            <div class="nav-icon" onclick="nav('profile')"><i class="fa-solid fa-clock-rotate-left"></i>Orders</div>
-        </div>
-    </div>
-
-    <!-- ADD MONEY MODAL -->
-    <div id="add-money-modal" class="modal">
-        <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
-            <i class="fa-solid fa-arrow-left" onclick="closeModal('add-money-modal')"></i>
-            <span style="font-weight: 700;">Deposit Money</span>
-        </div>
-        <div style="padding: 20px;">
-            <div style="background:white; padding:20px; border-radius:15px; border:1px solid #eee; margin-bottom:20px;">
-                <label style="font-size:12px; color:#666;">Step 1: Enter Amount & Pay</label>
-                <input type="number" id="pay-amount" class="input-box" style="margin-top:10px" placeholder="₹ Amount">
-                <button class="btn-main" onclick="openInstamojo()" style="background: #733dfa;">Open Instamojo Link</button>
-            </div>
-            <div style="background:white; padding:20px; border-radius:15px; border:1px solid #eee;">
-                <label style="font-size:12px; color:#666;">Step 2: Submit Payment ID / UTR</label>
-                <input type="text" id="req-utr" class="input-box" style="margin-top:10px" placeholder="Payment ID">
-                <button class="btn-main" onclick="submitDeposit()">Submit for Approval</button>
+    <!-- KYC MODAL -->
+    <div id="kyc-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border border-warning">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title rajdhani text-warning">IDENTITY VERIFICATION</h5>                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-shield-check display-1 text-warning mb-3"></i>
+                    <p class="small text-secondary">Upload Aadhar/PAN to unlock higher withdrawal limits.</p>
+                    <div class="border border-dashed border-secondary p-4 mb-3 rounded">
+                        <i class="bi bi-cloud-upload display-6 text-secondary"></i>
+                        <p class="small mt-2">Drag files here or click to upload</p>
+                    </div>
+                    <button class="btn btn-outline-warning w-100" onclick="simulateKYCUpload()">SUBMIT DOCUMENTS</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- PURCHASE MODAL -->
-    <div id="purchase-modal" class="modal">
-        <div style="padding: 20px; display: flex; align-items: center; gap: 15px;">
-            <i class="fa-solid fa-arrow-left" onclick="closeModal('purchase-modal')"></i>
-            <span style="font-weight: 700;">Checkout</span>
+    <!-- Top Header -->
+    <header class="p-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="rajdhani m-0">Protocol <span class="neon-text">Green</span></h5>
+            <small class="text-secondary" style="font-size: 0.6rem;">ID: <span id="user-id-display">GUEST</span></small>
         </div>
-        <div style="padding: 20px;">
-            <div style="background: white; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #eee; margin-bottom: 20px;">
-                <h3 id="buy-pkg-title">...</h3>
-                <h2 id="buy-pkg-price" style="color: var(--primary); margin-top:5px;">...</h2>
+        <div class="d-flex align-items-center gap-2">
+            <div id="ai-badge" class="badge rounded-pill border border-secondary text-secondary">
+                <i class="bi bi-cpu"></i> AI: OFF
             </div>
-            <input type="text" id="order-uid" class="input-box" placeholder="Player UID">
-            <input type="text" id="order-name" class="input-box" placeholder="Game Name">
-            <button class="btn-main" onclick="processOrder()">Buy Now</button>
+            <button class="btn btn-sm btn-outline-success d-none" id="auth-btn" onclick="showAuth()">
+                <i class="bi bi-person"></i>
+            </button>
         </div>
-    </div>
+    </header>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- MAIN VIEWS -->
+    <div class="container-fluid">
+        
+        <!-- 1. TRADE VIEW -->
+        <section id="view-trade" class="view-section active">
+            <div class="glass-panel text-center mb-3">
+                <small class="text-secondary text-uppercase">BTC/USDT Market</small>
+                <h2 class="rajdhani neon-text mb-0" id="live-price">65,420.00</h2>
+            </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCHZ4_PhE2gbJBDzipArubqJpHW88Alw5o",
-            authDomain: "tournament-62f77.firebaseapp.com",
-            databaseURL: "https://tournament-62f77-default-rtdb.firebaseio.com",
-            projectId: "tournament-62f77",
-            storageBucket: "tournament-62f77.firebasestorage.app",
-            messagingSenderId: "59905181993",
-            appId: "1:59905181993:web:8ad4f721ac50c09c478f38",
-            measurementId: "G-QHHJ1BJWMP"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+            <div id="chart-wrapper" class="glass-panel">
+                <canvas id="mainChart"></canvas>
+            </div>
 
-        let currentUser = null;
-        let selectedPack = null;
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <button class="btn btn-dark w-100 border-secondary small py-2" onclick="setTradeAmt(100)">₹100</button>
+                </div>
+                <div class="col-6">                    <button class="btn btn-dark w-100 border-secondary small py-2" onclick="setTradeAmt(500)">₹500</button>
+                </div>
+            </div>
 
-        // AUTH LOGIC
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('main-app').style.display = 'block';
-                document.getElementById('disp-email').innerText = user.email;
-                loadData();
-            } else {
-                document.getElementById('auth-screen').style.display = 'flex';
-                document.getElementById('main-app').style.display = 'none';
-            }
-        });
+            <div class="row g-3">
+                <div class="col-6">
+                    <button class="btn neon-btn-buy w-100 py-3" onclick="executeOrder('BUY')">
+                        <i class="bi bi-graph-up-arrow"></i> LONG
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn neon-btn-sell w-100 py-3" onclick="executeOrder('SELL')">
+                        <i class="bi bi-graph-down-arrow"></i> SHORT
+                    </button>
+                </div>
+            </div>
+            
+            <div id="active-orders" class="mt-4"></div>
+        </section>
 
-        function handleAuth() {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pass').value;
-            if (!e || p.length < 6) return alert("Enter valid email and 6-char password");
+        <!-- 2. WALLET VIEW -->
+        <section id="view-wallet" class="view-section">
+            <div class="glass-panel balance-card mb-4" data-aos="fade-right">
+                <p class="text-secondary small mb-1">CURRENT BALANCE</p>
+                <h1 class="rajdhani display-5" id="wallet-balance">₹0</h1>
+            </div>
 
-            auth.signInWithEmailAndPassword(e, p).catch(err => {
-                if (err.code === 'auth/user-not-found') {
-                    auth.createUserWithEmailAndPassword(e, p).then(c => {
-                        db.ref('users/' + c.user.uid).set({ balance: 0, email: e });
-                    });
-                } else { alert(err.message); }
-            });
-        }
+            <!-- Deposit Section -->
+            <h5 class="rajdhani mb-3 text-success"><i class="bi bi-plus-square"></i> Deposit Money</h5>
+            
+            <div class="glass-panel border-success mb-3">
+                <div class="mb-3">
+                    <p class="small mb-2"><span class="step-num">1</span> Enter Amount & Pay</p>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-dark border-secondary text-success">₹</span>
+                        <input type="number" id="deposit-input" class="form-control bg-dark text-white border-secondary" placeholder="Amount">
+                    </div>
+                    <a href="https://www.instamojo.com/@rajeshjani121/" target="_blank" class="btn btn-outline-success w-100 btn-sm">
+                        OPEN INSTAMOJO LINK <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
 
-        function loadData() {
-            db.ref('users/' + currentUser.uid + '/balance').on('value', s => {
-                const b = s.val() || 0;
-                document.getElementById('header-bal-amt').innerText = b;
-                document.getElementById('main-bal-amt').innerText = b;
-            });
+                <hr class="border-secondary">
 
-            db.ref('packages').on('value', s => {
-                const g = document.getElementById('packages-grid'); g.innerHTML = '';
-                s.forEach(c => {
-                    const p = c.val();
-                    const div = document.createElement('div');
-                    div.className = 'pkg-card';
-                    div.innerHTML = `<span class="pkg-amt">${p.diamonds} DM</span><span class="pkg-price">₹${p.price}</span>`;
-                    div.onclick = () => {
-                        selectedPack = p;
-                        openModal('purchase-modal');
-                        document.getElementById('buy-pkg-title').innerText = p.diamonds + " Diamonds";
-                        document.getElementById('buy-pkg-price').innerText = "₹" + p.price;
-                    };
-                    g.appendChild(div);
-                });
-            });
+                <div>
+                    <p class="small mb-2"><span class="step-num">2</span> Submit Payment ID / UTR</p>
+                    <input type="text" id="utr-input" class="form-control bg-dark text-white border-secondary mb-2" placeholder="Payment ID">
+                    <button class="btn neon-btn-buy w-100 btn-sm" onclick="submitDeposit()">SUBMIT FOR APPROVAL</button>
+                </div>
+            </div>
+            <!-- Withdrawal Section -->
+            <h5 class="rajdhani mb-3 text-warning"><i class="bi bi-dash-square"></i> Withdraw Funds</h5>
+            <div class="glass-panel border-warning mb-3">
+              <div class="mb-3">
+                <p class="small mb-2"><span class="step-num bg-warning text-dark">1</span> Enter Amount</p>
+                <div class="input-group mb-2">
+                  <span class="input-group-text bg-dark border-secondary text-warning">₹</span>
+                  <input type="number" id="withdraw-input" class="form-control bg-dark text-white border-secondary" placeholder="Min: ₹100">
+                </div>
+                <small class="text-secondary" style="font-size:0.65rem">Available: <span id="withdraw-available" class="text-success">₹0</span></small>
+              </div>
 
-            loadHistory();
-        }
+              <div>
+                <p class="small mb-2"><span class="step-num bg-warning text-dark">2</span> Select Method</p>
+                <select id="withdraw-method" class="form-select bg-dark text-white border-secondary mb-2">
+                  <option value="upi">UPI (Instant)</option>
+                  <option value="bank">Bank Transfer (24-48h)</option>
+                  <option value="crypto">Crypto Wallet</option>
+                </select>
+                
+                <input type="text" id="withdraw-details" class="form-control bg-dark text-white border-secondary mb-2" placeholder="UPI ID / Account No / Wallet Address">
+                
+                <button class="btn btn-outline-warning w-100 btn-sm" onclick="submitWithdrawal()">REQUEST WITHDRAWAL</button>
+              </div>
+            </div>
 
-        function loadHistory() {
-            db.ref('transactions').orderByChild('uid').equalTo(currentUser.uid).on('value', snap => {
-                const l = document.getElementById('trans-list'); l.innerHTML = '';
-                snap.forEach(c => {
-                    const t = c.val();
-                    l.innerHTML += `<div class="list-item"><div><p style="font-size:13px; font-weight:600">${t.description}</p></div><div style="text-align:right"><p style="font-weight:700">₹${t.amount}</p><span class="status-badge st-${t.status}">${t.status}</span></div></div>`;
-                });
-            });
+            <!-- Transaction History -->
+            <h5 class="rajdhani mb-3 text-info"><i class="bi bi-clock-history"></i> Recent Activity</h5>
+            <div id="tx-history" class="glass-panel small" style="max-height:150px; overflow-y:auto;">
+              <div class="text-secondary text-center py-2">No transactions yet</div>
+            </div>
+        </section>
 
-            db.ref('orders').orderByChild('placedByUid').equalTo(currentUser.uid).on('value', snap => {
-                const l = document.getElementById('order-history'); l.innerHTML = '';
-                snap.forEach(c => {
-                    const o = c.val();
-                    l.innerHTML += `<div class="list-item"><div><p style="font-size:13px; font-weight:600">${o.diamonds} DM</p><small>UID: ${o.targetUid}</small></div><span class="status-badge st-${o.status}">${o.status}</span></div>`;
-                });
-            });
-        }
+        <!-- 3. STATS VIEW -->
+        <section id="view-stats" class="view-section">
+            <h5 class="rajdhani neon-text mb-3">Operational Stats</h5>
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="glass-panel text-center">
+                        <small class="text-secondary d-block">Total Trades</small>
+                        <span class="h4 rajdhani" id="stat-total">0</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="glass-panel text-center">
+                        <small class="text-secondary d-block">Win Rate</small>
+                        <span class="h4 rajdhani text-success" id="stat-winrate">0%</span>
+                    </div>
+                </div>            </div>
+            <div class="glass-panel mt-3">
+                <p class="small text-secondary mb-2 text-uppercase">AI Analysis Log</p>
+                <div id="ai-log" class="small text-info" style="font-family: monospace; height: 150px; overflow-y: auto;"></div>
+            </div>
+        </section>
 
-        function openInstamojo() {
-            const amt = document.getElementById('pay-amount').value;
-            if (!amt) return alert("Enter amount");
-            window.open('https://www.instamojo.com/@rajeshjani121/', '_blank');
-        }
+        <!-- 4. PROFILE VIEW (NEW) -->
+        <section id="view-profile" class="view-section">
+            <div class="text-center mb-4" data-aos="fade-up">
+                <div class="profile-avatar" id="profile-avatar">?</div>
+                <h4 class="rajdhani mb-0" id="profile-name">Guest User</h4>
+                <small class="text-secondary" id="profile-email">Not Logged In</small>
+                <div class="mt-2">
+                    <span id="kyc-status" class="kyc-badge kyc-pending">UNVERIFIED</span>
+                </div>
+            </div>
 
-        function submitDeposit() {
-            const amt = parseInt(document.getElementById('pay-amount').value);
-            const utr = document.getElementById('req-utr').value;
-            if (!amt || !utr) return alert("Fill all fields");
+            <div class="glass-panel mb-4">
+                <h6 class="rajdhani text-secondary mb-3 border-bottom border-secondary pb-2">Performance</h6>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="text-success h5 mb-0" id="prof-total-profit">₹0</div>
+                        <small class="text-secondary" style="font-size:0.6rem">Net Profit</small>
+                    </div>
+                    <div class="col-4 border-start border-secondary">
+                        <div class="text-white h5 mb-0" id="prof-trades">0</div>
+                        <small class="text-secondary" style="font-size:0.6rem">Trades</small>
+                    </div>
+                    <div class="col-4 border-start border-secondary">
+                        <div class="text-info h5 mb-0" id="prof-winrate">0%</div>
+                        <small class="text-secondary" style="font-size:0.6rem">Win Rate</small>
+                    </div>
+                </div>
+            </div>
 
-            const txRef = db.ref('transactions').push();
-            txRef.set({ uid: currentUser.uid, type: 'credit', amount: amt, description: 'Instamojo Deposit', status: 'pending', timestamp: Date.now() })
-            .then(() => {
-                db.ref('deposit_requests').push({ uid: currentUser.uid, amount: amt, utr: utr, txId: txRef.key });
-                alert("Submitted!"); closeModal('add-money-modal');
-            });
-        }
-
-        function processOrder() {
-            const uid = document.getElementById('order-uid').value;
-            const name = document.getElementById('order-name').value;
-            if (!uid || !name) return alert("Fill details");
-            const pr = parseInt(selectedPack.price);
-
-            db.ref('users/' + currentUser.uid + '/balance').transaction(curr => {
-                if ((curr || 0) >= pr) return curr - pr;
-                return;
-            }, (err, comm) => {
-                if (comm) {
-                    db.ref('orders').push({ placedByUid: currentUser.uid, targetUid: uid, targetName: name, diamonds: selectedPack.diamonds, price: pr, status: 'pending', timestamp: Date.now() });
-                    db.ref('transactions').push({ uid: currentUser.uid, type: 'debit', amount: pr, description: 'Buy Diamonds', status: 'success', timestamp: Date.now() });
-                    alert("Order Placed!"); closeModal('purchase-modal');
-                } else alert("Low Balance");
-            });
-        }
-
-        function nav(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id + '-page').classList.add('active');
-            document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
-
-        function contactSupport() { db.ref('settings/supportLink').once('value', s => { window.open(s.val(), '_blank'); }); }
-        function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    </script>
-</body>
-</html>
+            <div class="glass-panel">
+                <h6 class="rajdhani text-secondary mb-3 border-bottom border-secondary pb-2">Settings</h6>
+                
+                <div class="setting-row">
+                    <span><i class="bi bi-bell me-2 text-success"></i> Push Notifications</span>
+                    <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                    <span><i class="bi bi-shield-lock me-2 text-warning"></i> Verify Identity (KYC)</span>
+                    <i class="bi bi-chevron-right text-secondary"></i>
+                </div>
+                <div class="setting-row" onclick="showAuth()" style="cursor:pointer">
+                    <span><i class="bi bi-person-gear me-2 text-info"></i> Account Details</span>
+                    <i class="bi bi-chevron-right text-secondary"></i>                </div>
+                <div 
