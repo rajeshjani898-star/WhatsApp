@@ -1,538 +1,488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>WhatsApp Clone</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <style>
-    /* ===== RESET & BASE ===== */
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #ECE5DD;
-      color: #111;
-      font-size: 14px;
-      line-height: 1.4;
-      overflow-x: hidden;
-    }
-
-    /* ===== APP CONTAINER ===== */
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
-      background: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-
-    /* ===== ONBOARDING SCREENS ===== */
-    .onboarding-screen {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: #fff; z-index: 500; display: none;
-      flex-direction: column; padding: 24px;
-      animation: fadeIn 0.3s ease;
-    }
-    .onboarding-screen.active { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    /* Welcome Screen */
-    .welcome-logo {
-      text-align: center; margin: 40px 0 30px;
-    }
-    .welcome-logo i {
-      font-size: 72px; color: #25D366;
-    }
-    .welcome-title {
-      text-align: center; font-size: 24px; font-weight: 500;      margin-bottom: 16px; color: #111;
-    }
-    .welcome-text {
-      text-align: center; color: #666; font-size: 14px;
-      margin-bottom: 24px; line-height: 1.5;
-    }
-    .welcome-text a {
-      color: #075E54; text-decoration: none; font-weight: 500;
-    }
-    .language-selector {
-      display: flex; align-items: center; justify-content: center;
-      gap: 8px; margin-bottom: 30px; color: #666;
-    }
-    .language-selector select {
-      border: none; background: #f0f0f0; padding: 8px 12px;
-      border-radius: 6px; font-size: 14px; color: #111;
-    }
-    .agree-btn {
-      background: #25D366; color: white; border: none;
-      padding: 14px; border-radius: 8px; font-size: 16px;
-      font-weight: 500; cursor: pointer; margin-top: auto;
-      width: 100%; max-width: 320px; align-self: center;
-    }
-    .agree-btn:disabled { background: #a5d6b9; cursor: not-allowed; }
-
-    /* Phone Entry Screen */
-    .phone-header {
-      display: flex; align-items: center; margin-bottom: 30px;
-    }
-    .back-btn {
-      background: none; border: none; font-size: 20px;
-      color: #075E54; margin-right: 12px; cursor: pointer;
-    }
-    .phone-title { font-size: 20px; font-weight: 500; }
-    .phone-subtitle {
-      color: #666; font-size: 14px; margin: 8px 0 20px;
-      line-height: 1.5;
-    }
-    .phone-subtitle a { color: #075E54; text-decoration: none; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NeonTrade Mobile - Login</title>
     
-    .country-selector {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 0; border-bottom: 1px solid #e6e6e6;
-      margin-bottom: 20px; cursor: pointer;
-    }
-    .country-flag { font-size: 24px; }
-    .country-name { flex: 1; font-weight: 500; }
-    .country-code { color: #666; font-weight: 500; }
-    .country-selector i { color: #666; }
-    .phone-input-group {
-      display: flex; gap: 12px; margin-bottom: 24px;
-    }
-    .phone-code {
-      padding: 14px 16px; border: 1px solid #ddd;
-      border-radius: 8px; font-size: 16px; background: #f9f9f9;
-      font-weight: 500; min-width: 70px; text-align: center;
-    }
-    .phone-number {
-      flex: 1; padding: 14px 16px; border: 1px solid #ddd;
-      border-radius: 8px; font-size: 16px; outline: none;
-    }
-    .phone-number:focus { border-color: #25D366; }
+    <!-- External Assets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 
-    .next-btn {
-      background: #25D366; color: white; border: none;
-      padding: 14px; border-radius: 8px; font-size: 16px;
-      font-weight: 500; cursor: pointer; width: 100%;
-      max-width: 320px; align-self: center; margin-top: 10px;
-    }
-    .next-btn:disabled { background: #a5d6b9; cursor: not-allowed; }
+    <style>
+        :root {
+            --neon-green: #00ff55;
+            --dark-bg: #000000;
+            --glass: rgba(0, 255, 85, 0.08);
+            --border: rgba(0, 255, 85, 0.3);
+        }
 
-    .whats-my-number {
-      text-align: center; margin-top: 20px;
-    }
-    .whats-my-number a {
-      color: #075E54; text-decoration: none; font-weight: 500;
-      font-size: 14px;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--dark-bg);
+            background-image: radial-gradient(circle at top right, #0a200a, #000);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 70px;
+            overflow-x: hidden;
+        }
 
-    /* OTP Screen */
-    .otp-title { font-size: 20px; font-weight: 500; margin-bottom: 8px; }
-    .otp-subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
-    .otp-inputs {
-      display: flex; gap: 10px; justify-content: center;
-      margin-bottom: 30px;
-    }
-    .otp-input {
-      width: 50px; height: 56px; border: 2px solid #ddd;
-      border-radius: 10px; font-size: 20px; text-align: center;
-      font-weight: 500; outline: none;
-    }
-    .otp-input:focus { border-color: #25D366; }
-    .resend-code {
-      text-align: center; color: #666; font-size: 14px;
-    }
-    .resend-code a {
-      color: #075E54; text-decoration: none; font-weight: 500;
-      margin-left: 4px;
-    }    .resend-code.disabled { color: #ccc; }
-    .resend-code.disabled a { color: #ccc; pointer-events: none; }
+        .rajdhani { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
 
-    /* ===== MAIN APP (Hidden Initially) ===== */
-    .main-app { display: none; }
-    .main-app.active { display: flex; }
+        .neon-text { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 85, 0.5); }
+        
+        .neon-btn { 
+            background: var(--neon-green); 
+            color: #000;             font-weight: 700; 
+            border: none;
+            box-shadow: 0 0 15px rgba(0, 255, 85, 0.4);
+        }
+        
+        .neon-btn-danger { 
+            background: #ff3333; 
+            color: #fff; 
+            font-weight: 700; 
+            border: none;
+        }
 
-    /* ===== HEADER ===== */
-    .header {
-      background: #075E54; color: white; padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
-    }
-    .header-title { font-size: 20px; font-weight: 500; }
-    .header-actions button {
-      background: none; border: none; color: white; font-size: 18px;
-      margin-left: 20px; cursor: pointer;
-    }
+        /* Auth Modal */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-overlay.hidden { display: none; }
+        
+        .auth-card {
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            background: var(--glass);
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #888;        }
+        .auth-tab.active {
+            background: var(--neon-green);
+            color: #000;
+        }
+        
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+        }
+        
+        .auth-footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #888;
+        }
 
-    /* ===== TAB CONTENT AREAS ===== */
-    .tab-content { display: none; flex: 1; overflow-y: auto; padding-bottom: 70px; }
-    .tab-content.active { display: block; }
+        /* Chart */
+        #chart-wrapper { height: 280px; width: 100%; position: relative; }
+        canvas { width: 100%; height: 100%; }
 
-    /* ===== CHATS TAB ===== */
-    .search-bar {
-      padding: 10px 16px; background: #fff;
-      border-bottom: 1px solid #e6e6e6;
-    }
-    .search-bar input {
-      width: 100%; padding: 10px 15px; border-radius: 8px;
-      border: 1px solid #ddd; background: #f0f0f0; font-size: 14px;
-    }
-    .chat-list { list-style: none; }
-    .chat-item {
-      display: flex; align-items: center; padding: 12px 16px;
-      border-bottom: 1px solid #f0f0f0; cursor: pointer; background: #fff;
-    }
-    .chat-item.active { background: #f5f5f5; }
-    .chat-avatar {
-      width: 50px; height: 50px; border-radius: 50%;
-      background: #ccc; margin-right: 12px; position: relative;
-      overflow: hidden; flex-shrink: 0;
-    }
-    .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .online-dot {
-      position: absolute; bottom: 2px; right: 2px;
-      width: 12px; height: 12px; background: #34C759;
-      border-radius: 50%; border: 2px solid #fff;
-    }
-    .chat-info { flex: 1; min-width: 0; }    .chat-header {
-      display: flex; justify-content: space-between; margin-bottom: 4px;
-    }
-    .chat-name { font-weight: 500; font-size: 16px; }
-    .chat-time { font-size: 12px; color: #666; }
-    .chat-preview {
-      display: flex; justify-content: space-between; color: #666;
-      font-size: 14px; white-space: nowrap; overflow: hidden;
-    }
-    .unread-badge {
-      background: #25D366; color: white; border-radius: 50%;
-      min-width: 20px; height: 20px; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 11px; font-weight: bold; margin-left: 8px;
-    }
+        /* Navigation */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        .nav-item { 
+            color: #555; 
+            text-decoration: none;             text-align: center; 
+            font-size: 0.7rem; 
+            padding: 5px 10px;
+        }
+        .nav-item.active { color: var(--neon-green); }
+        .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 2px; }
 
-    /* ===== STATUS TAB ===== */
-    .status-section { padding: 12px 0; }
-    .status-header {
-      padding: 12px 16px; display: flex; align-items: center;
-      border-bottom: 1px solid #f0f0f0; cursor: pointer;
-    }
-    .status-update { display: flex; align-items: center; margin-bottom: 8px; }
-    .status-add {
-      width: 56px; height: 56px; border-radius: 50%;
-      background: linear-gradient(135deg, #25D366, #128C7E);
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 24px; margin-right: 12px;
-      position: relative;
-    }
-    .status-add::after {
-      content: '+'; position: absolute; bottom: -2px; right: -2px;
-      background: #075E54; width: 20px; height: 20px;
-      border-radius: 50%; border: 3px solid #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: bold;
-    }
-    .status-item {
-      padding: 12px 16px; display: flex; align-items: center;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .status-ring {
-      width: 56px; height: 56px; border-radius: 50%;
-      padding: 3px; background: linear-gradient(45deg, #25D366, #128C7E, #075E54);
-      margin-right: 12px; flex-shrink: 0;
-    }
-    .status-ring img {
-      width: 100%; height: 100%; border-radius: 50%;
-      border: 3px solid #fff; object-fit: cover;
-    }
-    /* ===== CALLS TAB ===== */
-    .call-item {
-      display: flex; align-items: center; padding: 12px 16px;
-      border-bottom: 1px solid #f0f0f0; background: #fff;
-    }
-    .call-type {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: #e6f7ef; display: flex; align-items: center;
-      justify-content: center; color: #25D366; margin-right: 12px;
-    }
-    .call-info { flex: 1; }
-    .call-name { font-weight: 500; font-size: 16px; }
-    .call-time { font-size: 13px; color: #666; }
-    .call-action {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: #25D366; color: white; display: flex;
-      align-items: center; justify-content: center;
-      border: none; font-size: 14px;
-    }
+        /* Loading & Toast */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
 
-    /* ===== COMMUNITIES TAB ===== */
-    .community-card {
-      margin: 12px 16px; padding: 16px; background: #fff;
-      border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .community-header {
-      display: flex; align-items: center; margin-bottom: 12px;
-    }
-    .community-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      background: #075E54; color: white; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 20px; margin-right: 12px;
-    }
+        #toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border-left: 4px solid var(--neon-green);
+            z-index: 2000;
+            display: none;
+            font-size: 13px;
+        }
+        #toast.show { display: block; }
+        #toast.error { border-left-color: #ff3333; }
 
-    /* ===== CHAT SCREEN (Modal/Overlay) ===== */
-    .chat-screen {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: #ECE5DD; z-index: 200; display: none;
-      flex-direction: column;
-    }
-    .chat-screen.active { display: flex; }
-    .chat-header {
-      background: #075E54; color: white; padding: 10px 12px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .chat-header-left { display: flex; align-items: center; }
-    .back-chat-btn {
-      background: none; border: none; color: white;      font-size: 20px; margin-right: 8px; cursor: pointer;
-    }
-    .messages-container {
-      flex: 1; padding: 12px; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .message {
-      max-width: 75%; padding: 8px 10px; border-radius: 8px;
-      position: relative; font-size: 15px; line-height: 1.4;
-    }
-    .message.received {
-      align-self: flex-start; background: #fff; border-top-left-radius: 0;
-    }
-    .message.sent {
-      align-self: flex-end; background: #DCF8C6; border-top-right-radius: 0;
-    }
-    .message-time {
-      font-size: 11px; color: #666; display: block;
-      text-align: right; margin-top: 4px;
-    }
-    .message.sent .message-time { color: #54656f; }
-    .chat-input {
-      padding: 8px 12px; background: #f0f0f0;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .chat-input button {
-      background: none; border: none; font-size: 20px;
-      color: #54656f; cursor: pointer; padding: 8px;
-    }
-    .chat-input input {
-      flex: 1; padding: 12px 16px; border-radius: 24px;
-      border: none; font-size: 15px; background: #fff;
-    }
-    .chat-input #sendBtn { color: #075E54; }
-
-    /* ===== ATTACH MODAL ===== */
-    .modal {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5); z-index: 300;
-      display: none; align-items: flex-end;
-    }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: #fff; width: 100%;
-      border-radius: 20px 20px 0 0;
-      padding: 20px; animation: slideUp 0.3s ease;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }    }
-    .attach-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 20px; text-align: center;
-    }
-    .attach-item {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 8px; cursor: pointer;
-    }
-    .attach-icon {
-      width: 50px; height: 50px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; color: white;
-    }
-    .attach-icon.doc { background: #00BFA5; }
-    .attach-icon.camera { background: #5C6BC0; }
-    .attach-icon.gallery { background: #AB47BC; }
-    .attach-icon.audio { background: #FF7043; }
-    .attach-icon.location { background: #26A69A; }
-    .attach-icon.contact { background: #66BB6A; }
-    .attach-icon.poll { background: #FFA726; }
-
-    /* ===== VOICE MESSAGE RECORDING ===== */
-    .voice-recorder {
-      position: fixed; bottom: 80px; left: 50%;
-      transform: translateX(-50%);
-      background: #333; color: white;
-      padding: 12px 24px; border-radius: 30px;
-      display: none; align-items: center; gap: 12px;
-      z-index: 250; animation: pulse 1.5s infinite;
-    }
-    .voice-recorder.active { display: flex; }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
-      70% { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
-      100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-    }
-    .record-wave { display: flex; gap: 3px; align-items: center; }
-    .wave-bar {
-      width: 4px; height: 12px; background: #25D366;
-      border-radius: 2px; animation: wave 0.5s ease infinite alternate;
-    }
-    .wave-bar:nth-child(2) { animation-delay: 0.1s; height: 18px; }
-    .wave-bar:nth-child(3) { animation-delay: 0.2s; height: 14px; }
-    @keyframes wave { from { height: 8px; } to { height: 20px; } }
-
-    /* ===== BOTTOM NAVIGATION ===== */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 50%;
-      transform: translateX(-50%);      width: 100%; max-width: 480px;
-      background: #fff; border-top: 1px solid #e6e6e6;
-      display: flex; justify-content: space-around;
-      padding: 8px 0; z-index: 150;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 4px; background: none; border: none;
-      color: #8696a0; font-size: 10px; cursor: pointer;
-      padding: 4px 8px;
-    }
-    .nav-item.active { color: #075E54; }
-    .nav-item i { font-size: 20px; }
-
-    /* ===== UTILITIES ===== */
-    .hidden { display: none !important; }
-    .fab {
-      position: fixed; bottom: 80px; right: 20px;
-      width: 56px; height: 56px; border-radius: 50%;
-      background: #25D366; color: white; border: none;
-      font-size: 24px; display: flex; align-items: center;
-      justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      cursor: pointer; z-index: 120;
-    }
-
-    /* ===== MESSAGE ACTIONS POPUP ===== */
-    .message-actions {
-      position: absolute; bottom: 100%; right: 0;
-      background: white; border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: none; flex-direction: column;
-      min-width: 140px; overflow: hidden; z-index: 10;
-    }
-    .message-actions.show { display: flex; }
-    .action-btn {
-      padding: 12px 16px; border: none; background: none;
-      text-align: left; font-size: 14px; cursor: pointer;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .action-btn:hover { background: #f5f5f5; }
-    .action-btn.danger { color: #e53935; }
-
-    /* ===== SETTINGS TAB ===== */
-    .settings-list { list-style: none; background: #fff; }
-    .settings-item {
-      padding: 16px; border-bottom: 1px solid #f0f0f0;
-      display: flex; align-items: center; justify-content: space-between;
-      cursor: pointer;
-    }
-    .settings-item i { color: #075E54; margin-right: 12px; width: 24px; }    .profile-section {
-      padding: 20px 16px; display: flex; align-items: center;
-      border-bottom: 1px solid #f0f0f0; background: #fff;
-    }
-    .profile-large {
-      width: 72px; height: 72px; border-radius: 50%;
-      background: #ccc; margin-right: 16px;
-    }
-
-    /* ===== DARK MODE SUPPORT ===== */
-    @media (prefers-color-scheme: dark) {
-      body { background: #111b21; color: #e9edef; }
-      .app, .onboarding-screen, .modal-content { background: #111b21; }
-      .chat-item, .settings-item, .community-card { background: #202c33; border-color: #2a3942; }
-      .message.received { background: #202c33; }
-      .message.sent { background: #005c4b; }
-      .chat-input input, .phone-number, .otp-input { background: #2a3942; color: #e9edef; border-color: #3d4f58; }
-      .phone-code { background: #2a3942; color: #e9edef; border-color: #3d4f58; }
-      .bottom-nav { background: #202c33; border-color: #2a3942; }
-      .search-bar input { background: #2a3942; color: #e9edef; }
-    }
-  </style>
+        /* User Profile */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            display: flex;            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #000;
+            font-size: 14px;
+        }
+        .balance-card { border-left: 5px solid var(--neon-green); }
+        .step-num { 
+            width: 25px; height: 25px; background: var(--neon-green); color: #000; 
+            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+            font-weight: bold; margin-right: 10px; font-size: 0.8rem;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- ===== ONBOARDING: WELCOME SCREEN ===== -->
-  <section id="welcomeScreen" class="onboarding-screen active">
-    <div class="welcome-logo">
-      <i class="fab fa-whatsapp"></i>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+        <h2 class="rajdhani neon-text mb-2">NEON TRADE</h2>
+        <span class="text-secondary small">SECURE PROTOCOL V7.1</span>
     </div>
-    <h1 class="welcome-title">Welcome to WhatsApp</h1>
-    <p class="welcome-text">
-      Read our <a href="#" id="privacyLink">Privacy Policy</a>. 
-      Tap "Agree and continue" to accept our <a href="#" id="termsLink">Terms of Service</a>.
-    </p>
-    
-    <div class="language-selector">
-      <i class="fas fa-globe"></i>
-      <select id="languageSelect">
-        <option value="en">English</option>
-        <option value="hi">हिन्दी</option>
-        <option value="es">Español</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="pt">Português</option>
-      </select>
-    </div>
-    
-    <button class="agree-btn" id="agreeBtn">Agree and continue</button>
-  </section>
-  <!-- ===== ONBOARDING: PHONE NUMBER SCREEN ===== -->
-  <section id="phoneScreen" class="onboarding-screen">
-    <div class="phone-header">
-      <button class="back-btn" id="backToWelcome"><i class="fas fa-arrow-left"></i></button>
-      <h2 class="phone-title">Enter your phone number</h2>
-    </div>
-    
-    <p class="phone-subtitle">
-      WhatsApp will need to verify your phone number. 
-      <a href="#">Carrier charges may apply</a>.
-    </p>
-    
-    <div class="country-selector" id="countrySelector">
-      <span class="country-flag">🇮🇳</span>
-      <span class="country-name">India</span>
-      <span class="country-code">+91</span>
-      <i class="fas fa-chevron-down"></i>
-    </div>
-    
-    <div class="phone-input-group">
-      <input type="text" class="phone-code" value="+91" readonly />
-      <input type="tel" class="phone-number" id="phoneNumberInput" placeholder="Phone number" maxlength="10" pattern="[0-9]{10}" />
-    </div>
-    
-    <button class="next-btn" id="nextBtn" disabled>Next</button>
-    
-    <p class="whats-my-number">
-      <a href="#" id="whatsMyNumber">What's my number?</a>
-    </p>
-  </section>
 
-  <!-- ===== ONBOARDING: OTP VERIFICATION SCREEN ===== -->
-  <section id="otpScreen" class="onboarding-screen">
-    <div class="phone-header">
-      <button class="back-btn" id="backToPhone"><i class="fas fa-arrow-left"></i></button>
-      <h2 class="phone-title">Verify your number</h2>
+    <!-- Auth Modal -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <h3 class="rajdhani neon-text mb-4">🔐 Access Protocol</h3>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <input type="email" class="form-input" id="loginEmail" placeholder="Email Address" required>
+                <input type="password" class="form-input" id="loginPassword" placeholder="Password" required minlength="6">
+                <button type="submit" class="btn neon-btn w-100 py-2">🔓 LOGIN</button>
+            </form>
+            
+            <!-- Signup Form -->
+            <form class="auth-form" id="signupForm">
+                <input type="text" class="form-input" id="signupName" placeholder="Full Name" required>
+                <input type="email" class="form-input" id="signupEmail" placeholder="Email Address" required>
+                <input type="password" class="form-input" id="signupPassword" placeholder="Password (min 6 chars)" required minlength="6">
+                <button type="submit" class="btn neon-btn w-100 py-2">✨ CREATE ACCOUNT</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Or continue with</p>                <button class="btn btn-outline-secondary btn-sm mt-2" id="btnDemo">
+                    <i class="bi bi-controller"></i> Demo Mode
+                </button>
+            </div>
+        </div>
     </div>
+
+    <!-- Main App -->
+    <div id="mainApp" style="display: none;">
+        
+        <!-- Header -->
+        <header class="p-3 d-flex justify-content-between align-items-center">
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div>
+                    <h5 class="rajdhani m-0" id="userName">User</h5>
+                    <small class="text-secondary" style="font-size: 0.6rem;" id="userEmailDisplay">user@email.com</small>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-danger" id="btnLogout" style="font-size: 0.7rem;">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </header>
+
+        <!-- MAIN VIEWS -->
+        <div class="container-fluid px-3">
+            
+            <!-- TRADE VIEW -->
+            <section id="view-trade" class="view-section active">
+                <div class="glass-panel text-center mb-3">
+                    <small class="text-secondary text-uppercase" style="font-size: 0.65rem;">BTC/USDT Market</small>
+                    <h2 class="rajdhani neon-text mb-0" id="live-price" style="font-size: 1.8rem;">65,420.00</h2>
+                    <small id="price-change" class="text-success" style="font-size: 0.7rem;">+0.00%</small>
+                </div>
+
+                <div id="chart-wrapper" class="glass-panel">
+                    <canvas id="mainChart"></canvas>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-4">
+                        <button class="btn btn-dark w-100 border-secondary small py-2" id="btnAmt50">₹50</button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-dark w-100 border-secondary small py-2" id="btnAmt100">₹100</button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-dark w-100 border-secondary small py-2" id="btnAmt500">₹500</button>
+                    </div>
+                </div>
+                <div class="glass-panel mb-3">
+                    <small class="text-secondary d-block mb-2" style="font-size: 0.7rem;">TRADE AMOUNT</small>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-success">₹</span>
+                        <input type="number" id="trade-amount-input" class="form-control bg-dark text-white border-secondary" value="100" min="10">
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <button class="btn neon-btn w-100 py-3" id="btnLong">
+                            <i class="bi bi-graph-up-arrow"></i> LONG
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn neon-btn-danger w-100 py-3" id="btnShort">
+                            <i class="bi bi-graph-down-arrow"></i> SHORT
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="active-orders" class="mt-4">
+                    <small class="text-secondary" style="font-size: 0.7rem;">No active orders</small>
+                </div>
+            </section>
+
+            <!-- WALLET VIEW -->
+            <section id="view-wallet" class="view-section">
+                <div class="glass-panel balance-card mb-4">
+                    <p class="text-secondary small mb-1" style="font-size: 0.7rem;">CURRENT BALANCE</p>
+                    <h1 class="rajdhani neon-text mb-0" id="wallet-balance" style="font-size: 2.2rem;">₹0.00</h1>
+                </div>
+
+                <h5 class="rajdhani mb-3 text-success" style="font-size: 1rem;">
+                    <i class="bi bi-plus-square"></i> Deposit Money
+                </h5>
+                
+                <div class="glass-panel border-success mb-3">
+                    <div class="mb-3">
+                        <p class="small mb-2 d-flex align-items-center">
+                            <span class="step-num">1</span> 
+                            <span>Enter Amount & Pay via Instamojo</span>
+                        </p>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text bg-dark border-secondary text-success">₹</span>
+                            <input type="number" id="deposit-input" class="form-control bg-dark text-white border-secondary" placeholder="Min ₹10" min="10" value="50">
+                        </div>
+                        <a href="https://www.instamojo.com/@rajeshjani121/" target="_blank" class="btn btn-outline-success w-100 btn-sm">
+                            OPEN INSTAMOJO <i class="bi bi-box-arrow-up-right"></i>                        </a>
+                    </div>
+
+                    <hr class="border-secondary my-3">
+
+                    <div>
+                        <p class="small mb-2 d-flex align-items-center">
+                            <span class="step-num">2</span> 
+                            <span>Submit Payment ID / UTR for Approval</span>
+                        </p>
+                        <input type="text" id="utr-input" class="form-control bg-dark text-white border-secondary mb-2" placeholder="e.g., UTI123456789">
+                        <button class="btn neon-btn w-100 btn-sm" id="btnSubmitUTR">SUBMIT FOR APPROVAL</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STATS VIEW -->
+            <section id="view-stats" class="view-section">
+                <h5 class="rajdhani neon-text mb-3" style="font-size: 1rem;">Operational Stats</h5>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="glass-panel text-center">
+                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Total Trades</small>
+                            <span class="h4 rajdhani neon-text mb-0" id="stat-total" style="font-size: 1.5rem;">0</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="glass-panel text-center">
+                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Win Rate</small>
+                            <span class="h4 rajdhani text-success mb-0" id="stat-winrate" style="font-size: 1.5rem;">0%</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="glass-panel text-center">
+                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Total Profit</small>
+                            <span class="h4 rajdhani text-success mb-0" id="stat-profit" style="font-size: 1.5rem;">₹0</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="glass-panel text-center">
+                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Balance</small>
+                            <span class="h4 rajdhani neon-text mb-0" id="stat-balance" style="font-size: 1.5rem;">₹0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-panel mt-3">
+                    <p class="small text-secondary mb-2 text-uppercase" style="font-size: 0.65rem;">Activity Log</p>
+                    <div id="activity-log" class="small text-info" style="font-family: monospace; font-size: 0.7rem; max-height: 150px; overflow-y: auto;">
+                        <div class="text-secondary">> Welcome to NeonTrade!</div>                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="mobile-nav">
+            <a href="#" class="nav-item active" id="nav-trade">
+                <i class="bi bi-graph-up"></i>Trade
+            </a>
+            <a href="#" class="nav-item" id="nav-wallet">
+                <i class="bi bi-wallet2"></i>Wallet
+            </a>
+            <a href="#" class="nav-item" id="nav-stats">
+                <i class="bi bi-cpu"></i>Stats
+            </a>
+        </nav>
+
+        <!-- Toast -->
+        <div id="toast"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
-    <p class="otp-subtitle">
-      Enter the 6-digit code sent to <strong id="displayNumber">+91 XXXXX XXXXX</strong>
-    </p>
-    
-    <div class="otp-inputs">
-      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" />
-      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" />
-      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" />
-      <input type="text" class="otp-inpu
+    <!-- Other Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ==================== APP STATE ====================
+        var app = {
+            user: null,
+            balance: 1000,
+            price: 65420,
+            prevPrice: 65420,
+            candles: [],
+            stats: { total: 0, wins: 0, profit: 0 },
+            tradeAmt: 100,
+            firebase: null,
+            auth: null,
+            db: null
+        };
+
+        var firebaseConfig = {
+            apiKey: "AIzaSyCHZ4_PhE2gbJBDzipArubqJpHW88Alw5o",
+            authDomain: "tournament-62f77.firebaseapp.com",
+            projectId: "tournament-62f77",            storageBucket: "tournament-62f77.firebasestorage.app",
+            messagingSenderId: "59905181993",
+            appId: "1:59905181993:web:8ad4f721ac50c09c478f38"
+        };
+
+        // ==================== INITIALIZATION ====================
+        window.onload = function() {
+            console.log('🚀 Initializing NeonTrade...');
+            
+            // Initialize Firebase
+            initFirebase();
+            
+            // Check auth state
+            checkAuthState();
+            
+            // Hide loading after 1.5s
+            setTimeout(function() {
+                var loading = document.getElementById('loading-screen');
+                if (loading) {
+                    loading.style.opacity = '0';
+                    setTimeout(function() { loading.style.display = 'none'; }, 300);
+                }
+            }, 1500);
+            
+            // Setup chart
+            initChart();
+            setInterval(updateMarket, 1000);
+            window.addEventListener('resize', drawChart);
+            
+            // Setup all event listeners
+            setupEventListeners();
+            
+            console.log('✅ App initialized');
+        };
+
+        // ==================== EVENT LISTENERS ====================
+        function setupEventListeners() {
+            // Auth tabs
+            document.getElementById('tab-login').onclick = function() { switchAuthTab('login'); };
+            document.getElementById('tab-signup').onclick = function() { switchAuthTab('signup'); };
+            
+            // Auth forms
+            document.getElementById('loginForm').onsubmit = handleLogin;
+            document.getElementById('signupForm').onsubmit = handleSignup;
+            
+            // Demo button
+            document.getElementById('btnDemo').onclick = d
