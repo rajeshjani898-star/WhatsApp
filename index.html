@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonTrade Mobile - Login</title>
+    <title>NeonTrade - Secure Protocol</title>
     
-    <!-- External Assets -->
+    <!-- CSS Assets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -19,470 +24,269 @@
             --border: rgba(0, 255, 85, 0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
             background-color: var(--dark-bg);
             background-image: radial-gradient(circle at top right, #0a200a, #000);
             color: #fff;
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding-bottom: 70px;
+            padding-bottom: 80px;
             overflow-x: hidden;
         }
 
-        .rajdhani { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
+        .rajdhani { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; }
         .neon-text { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 85, 0.5); }
-        
-        .neon-btn { 
-            background: var(--neon-green); 
-            color: #000;             font-weight: 700; 
-            border: none;
-            box-shadow: 0 0 15px rgba(0, 255, 85, 0.4);
-        }
-        
-        .neon-btn-danger { 
-            background: #ff3333; 
-            color: #fff; 
-            font-weight: 700; 
-            border: none;
-        }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 15px; padding: 15px; }
 
-        /* Auth Modal */
-        .auth-overlay {
+        /* Login Overlay */
+        #auth-screen {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 2000;
+            background: #000;
+            z-index: 10000;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        .auth-overlay.hidden { display: none; }
-        
-        .auth-card {
-            background: rgba(20, 20, 20, 0.95);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 25px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        
-        .auth-tabs {
-            display: flex;
-            background: var(--glass);
-            border-radius: 10px;
-            padding: 5px;
-            margin-bottom: 20px;
-        }
-        .auth-tab {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #888;        }
-        .auth-tab.active {
-            background: var(--neon-green);
-            color: #000;
-        }
-        
-        .auth-form { display: none; }
-        .auth-form.active { display: block; }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            background: #1a1a1a;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: var(--neon-green);
-        }
-        
-        .auth-footer {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #888;
-        }
 
-        /* Chart */
-        #chart-wrapper { height: 280px; width: 100%; position: relative; }
-        canvas { width: 100%; height: 100%; }
+        .auth-card { width: 100%; max-width: 400px; padding: 30px; border: 1px solid var(--neon-green); box-shadow: 0 0 20px rgba(0, 255, 85, 0.2); }
+        .form-control { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; }
+        .form-control:focus { background: rgba(255,255,255,0.1); border-color: var(--neon-green); color: #fff; box-shadow: none; }
 
-        /* Navigation */
-        .mobile-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.95);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 1000;
-        }
-        .nav-item { 
-            color: #555; 
-            text-decoration: none;             text-align: center; 
-            font-size: 0.7rem; 
-            padding: 5px 10px;
-        }
+        /* App Layout */
+        #app-content { display: none; }
+        .view-section { display: none; padding: 10px; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
+        .nav-item { color: #555; text-decoration: none; text-align: center; font-size: 0.7rem; }
         .nav-item.active { color: var(--neon-green); }
-        .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 2px; }
+        .nav-item i { font-size: 1.5rem; display: block; }
 
-        /* Loading & Toast */
-        #loading-screen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .view-section { display: none; }
-        .view-section.active { display: block; }
-
-        #toast {
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 10px;
-            border-left: 4px solid var(--neon-green);
-            z-index: 2000;
-            display: none;
-            font-size: 13px;
-        }
-        #toast.show { display: block; }
-        #toast.error { border-left-color: #ff3333; }
-
-        /* User Profile */
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: var(--neon-green);
-            border-radius: 50%;
-            display: flex;            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #000;
-            font-size: 14px;
-        }
-        .balance-card { border-left: 5px solid var(--neon-green); }
-        .step-num { 
-            width: 25px; height: 25px; background: var(--neon-green); color: #000; 
-            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: bold; margin-right: 10px; font-size: 0.8rem;
-        }
+        #loading-screen { position: fixed; inset: 0; background: #000; z-index: 11000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <!-- Loading Screen -->
     <div id="loading-screen">
-        <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-        <h2 class="rajdhani neon-text mb-2">NEON TRADE</h2>
-        <span class="text-secondary small">SECURE PROTOCOL V7.1</span>
+        <div class="spinner-border text-success mb-3"></div>
+        <h4 class="rajdhani neon-text">NEON TRADE</h4>
     </div>
 
-    <!-- Auth Modal -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-card">
-            <h3 class="rajdhani neon-text mb-4">🔐 Access Protocol</h3>
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-card glass-panel text-center">
+            <h2 class="rajdhani neon-text mb-4" id="auth-title">ACCESS PORTAL</h2>
             
-            <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</div>
-                <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
-            </div>
+            <input type="email" id="auth-email" class="form-control mb-3" placeholder="Neural Email">
+            <input type="password" id="auth-pass" class="form-control mb-4" placeholder="Security Key">
             
-            <!-- Login Form -->
-            <form class="auth-form active" id="loginForm">
-                <input type="email" class="form-input" id="loginEmail" placeholder="Email Address" required>
-                <input type="password" class="form-input" id="loginPassword" placeholder="Password" required minlength="6">
-                <button type="submit" class="btn neon-btn w-100 py-2">🔓 LOGIN</button>
-            </form>
-            
-            <!-- Signup Form -->
-            <form class="auth-form" id="signupForm">
-                <input type="text" class="form-input" id="signupName" placeholder="Full Name" required>
-                <input type="email" class="form-input" id="signupEmail" placeholder="Email Address" required>
-                <input type="password" class="form-input" id="signupPassword" placeholder="Password (min 6 chars)" required minlength="6">
-                <button type="submit" class="btn neon-btn w-100 py-2">✨ CREATE ACCOUNT</button>
-            </form>
-            
-            <div class="auth-footer">
-                <p>Or continue with</p>                <button class="btn btn-outline-secondary btn-sm mt-2" id="btnDemo">
-                    <i class="bi bi-controller"></i> Demo Mode
-                </button>
-            </div>
+            <button class="btn btn-success w-100 fw-bold mb-3 py-2" onclick="handleAuth()">INITIALIZE LINK</button>
+            <p class="small text-secondary" id="auth-toggle-text">
+                New Protocol? <a href="javascript:void(0)" class="neon-text" onclick="toggleAuthMode()">Register UID</a>
+            </p>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div id="mainApp" style="display: none;">
-        
-        <!-- Header -->
+    <!-- MAIN APP CONTENT -->
+    <div id="app-content">
         <header class="p-3 d-flex justify-content-between align-items-center">
-            <div class="user-profile">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <div>
-                    <h5 class="rajdhani m-0" id="userName">User</h5>
-                    <small class="text-secondary" style="font-size: 0.6rem;" id="userEmailDisplay">user@email.com</small>
-                </div>
+            <div>
+                <h5 class="rajdhani m-0">Protocol <span class="neon-text">Green</span></h5>
+                <small class="text-secondary" id="user-display" style="font-size: 0.6rem;">UID: ...</small>
             </div>
-            <button class="btn btn-sm btn-outline-danger" id="btnLogout" style="font-size: 0.7rem;">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="logout()"><i class="bi bi-power"></i></button>
         </header>
 
-        <!-- MAIN VIEWS -->
-        <div class="container-fluid px-3">
-            
+        <main class="container-fluid">
             <!-- TRADE VIEW -->
             <section id="view-trade" class="view-section active">
                 <div class="glass-panel text-center mb-3">
-                    <small class="text-secondary text-uppercase" style="font-size: 0.65rem;">BTC/USDT Market</small>
-                    <h2 class="rajdhani neon-text mb-0" id="live-price" style="font-size: 1.8rem;">65,420.00</h2>
-                    <small id="price-change" class="text-success" style="font-size: 0.7rem;">+0.00%</small>
+                    <small class="text-secondary text-uppercase">Live BTC/USDT</small>
+                    <h2 class="rajdhani neon-text mb-0" id="live-price">65,420.00</h2>
                 </div>
-
-                <div id="chart-wrapper" class="glass-panel">
-                    <canvas id="mainChart"></canvas>
+                <div class="glass-panel p-1 mb-3">
+                    <canvas id="mainChart" style="height: 250px; width: 100%;"></canvas>
                 </div>
-
-                <div class="row g-2 mb-3">
-                    <div class="col-4">
-                        <button class="btn btn-dark w-100 border-secondary small py-2" id="btnAmt50">₹50</button>
-                    </div>
-                    <div class="col-4">
-                        <button class="btn btn-dark w-100 border-secondary small py-2" id="btnAmt100">₹100</button>
-                    </div>
-                    <div class="col-4">
-                        <button class="btn btn-dark w-100 border-secondary small py-2" id="btnAmt500">₹500</button>
-                    </div>
-                </div>
-                <div class="glass-panel mb-3">
-                    <small class="text-secondary d-block mb-2" style="font-size: 0.7rem;">TRADE AMOUNT</small>
-                    <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-success">₹</span>
-                        <input type="number" id="trade-amount-input" class="form-control bg-dark text-white border-secondary" value="100" min="10">
-                    </div>
-                </div>
-
                 <div class="row g-3">
-                    <div class="col-6">
-                        <button class="btn neon-btn w-100 py-3" id="btnLong">
-                            <i class="bi bi-graph-up-arrow"></i> LONG
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn neon-btn-danger w-100 py-3" id="btnShort">
-                            <i class="bi bi-graph-down-arrow"></i> SHORT
-                        </button>
-                    </div>
+                    <div class="col-6"><button class="btn btn-success w-100 py-3 fw-bold" onclick="executeOrder('BUY')">CALL</button></div>
+                    <div class="col-6"><button class="btn btn-danger w-100 py-3 fw-bold" onclick="executeOrder('SELL')">PUT</button></div>
                 </div>
-                
-                <div id="active-orders" class="mt-4">
-                    <small class="text-secondary" style="font-size: 0.7rem;">No active orders</small>
-                </div>
+                <div id="active-orders" class="mt-4"></div>
             </section>
 
             <!-- WALLET VIEW -->
             <section id="view-wallet" class="view-section">
-                <div class="glass-panel balance-card mb-4">
-                    <p class="text-secondary small mb-1" style="font-size: 0.7rem;">CURRENT BALANCE</p>
-                    <h1 class="rajdhani neon-text mb-0" id="wallet-balance" style="font-size: 2.2rem;">₹0.00</h1>
+                <div class="glass-panel border-start border-4 border-success mb-4">
+                    <p class="text-secondary small mb-1">CREDIT BALANCE</p>
+                    <h1 class="rajdhani display-5" id="wallet-balance">₹0.00</h1>
                 </div>
-
-                <h5 class="rajdhani mb-3 text-success" style="font-size: 1rem;">
-                    <i class="bi bi-plus-square"></i> Deposit Money
-                </h5>
-                
-                <div class="glass-panel border-success mb-3">
-                    <div class="mb-3">
-                        <p class="small mb-2 d-flex align-items-center">
-                            <span class="step-num">1</span> 
-                            <span>Enter Amount & Pay via Instamojo</span>
-                        </p>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary text-success">₹</span>
-                            <input type="number" id="deposit-input" class="form-control bg-dark text-white border-secondary" placeholder="Min ₹10" min="10" value="50">
-                        </div>
-                        <a href="https://www.instamojo.com/@rajeshjani121/" target="_blank" class="btn btn-outline-success w-100 btn-sm">
-                            OPEN INSTAMOJO <i class="bi bi-box-arrow-up-right"></i>                        </a>
-                    </div>
-
-                    <hr class="border-secondary my-3">
-
-                    <div>
-                        <p class="small mb-2 d-flex align-items-center">
-                            <span class="step-num">2</span> 
-                            <span>Submit Payment ID / UTR for Approval</span>
-                        </p>
-                        <input type="text" id="utr-input" class="form-control bg-dark text-white border-secondary mb-2" placeholder="e.g., UTI123456789">
-                        <button class="btn neon-btn w-100 btn-sm" id="btnSubmitUTR">SUBMIT FOR APPROVAL</button>
-                    </div>
+                <div class="glass-panel border-secondary">
+                    <h6 class="rajdhani text-success mb-3">Deposit Credits</h6>
+                    <input type="number" id="dep-amt" class="form-control bg-dark text-white mb-2" placeholder="Amount">
+                    <a href="https://www.instamojo.com/@rajeshjani121/" target="_blank" class="btn btn-outline-success btn-sm w-100 mb-3">PAY VIA INSTAMOJO</a>
+                    <input type="text" id="dep-utr" class="form-control bg-dark text-white mb-2" placeholder="Transaction ID / UTR">
+                    <button class="btn btn-success w-100" onclick="submitDeposit()">SUBMIT FOR APPROVAL</button>
                 </div>
             </section>
 
             <!-- STATS VIEW -->
             <section id="view-stats" class="view-section">
-                <h5 class="rajdhani neon-text mb-3" style="font-size: 1rem;">Operational Stats</h5>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="glass-panel text-center">
-                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Total Trades</small>
-                            <span class="h4 rajdhani neon-text mb-0" id="stat-total" style="font-size: 1.5rem;">0</span>
-                        </div>
+                <h5 class="rajdhani neon-text mb-3">Performance Log</h5>
+                <div class="glass-panel mb-3">
+                    <div id="ai-log" class="small text-info" style="font-family: monospace; height: 200px; overflow-y: auto;">
+                        > SYSTEM READY...
                     </div>
-                    <div class="col-6">
-                        <div class="glass-panel text-center">
-                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Win Rate</small>
-                            <span class="h4 rajdhani text-success mb-0" id="stat-winrate" style="font-size: 1.5rem;">0%</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="glass-panel text-center">
-                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Total Profit</small>
-                            <span class="h4 rajdhani text-success mb-0" id="stat-profit" style="font-size: 1.5rem;">₹0</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="glass-panel text-center">
-                            <small class="text-secondary d-block" style="font-size: 0.65rem;">Balance</small>
-                            <span class="h4 rajdhani neon-text mb-0" id="stat-balance" style="font-size: 1.5rem;">₹0</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="glass-panel mt-3">
-                    <p class="small text-secondary mb-2 text-uppercase" style="font-size: 0.65rem;">Activity Log</p>
-                    <div id="activity-log" class="small text-info" style="font-family: monospace; font-size: 0.7rem; max-height: 150px; overflow-y: auto;">
-                        <div class="text-secondary">> Welcome to NeonTrade!</div>                    </div>
                 </div>
             </section>
+        </main>
 
-        </div>
-
-        <!-- Bottom Navigation -->
         <nav class="mobile-nav">
-            <a href="#" class="nav-item active" id="nav-trade">
-                <i class="bi bi-graph-up"></i>Trade
-            </a>
-            <a href="#" class="nav-item" id="nav-wallet">
-                <i class="bi bi-wallet2"></i>Wallet
-            </a>
-            <a href="#" class="nav-item" id="nav-stats">
-                <i class="bi bi-cpu"></i>Stats
-            </a>
+            <a href="javascript:void(0)" class="nav-item active" onclick="switchView('trade', this)"><i class="bi bi-graph-up"></i>Trade</a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchView('wallet', this)"><i class="bi bi-wallet2"></i>Wallet</a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchView('stats', this)"><i class="bi bi-cpu"></i>AI</a>
         </nav>
-
-        <!-- Toast -->
-        <div id="toast"></div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
-    <!-- Other Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        // ==================== APP STATE ====================
-        var app = {
-            user: null,
-            balance: 1000,
-            price: 65420,
-            prevPrice: 65420,
-            candles: [],
-            stats: { total: 0, wins: 0, profit: 0 },
-            tradeAmt: 100,
-            firebase: null,
-            auth: null,
-            db: null
-        };
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+  apiKey: "AIzaSyCHZ4_PhE2gbJBDzipArubqJpHW88Alw5o",
+  authDomain: "tournament-62f77.firebaseapp.com",
+  databaseURL: "https://tournament-62f77-default-rtdb.firebaseio.com",
+  projectId: "tournament-62f77",
+  storageBucket: "tournament-62f77.firebasestorage.app",
+  messagingSenderId: "59905181993",
+  appId: "1:59905181993:web:8ad4f721ac50c09c478f38",
+  measurementId: "G-QHHJ1BJWMP"
+};
 
-        var firebaseConfig = {
-            apiKey: "AIzaSyCHZ4_PhE2gbJBDzipArubqJpHW88Alw5o",
-            authDomain: "tournament-62f77.firebaseapp.com",
-            projectId: "tournament-62f77",            storageBucket: "tournament-62f77.firebasestorage.app",
-            messagingSenderId: "59905181993",
-            appId: "1:59905181993:web:8ad4f721ac50c09c478f38"
-        };
 
-        // ==================== INITIALIZATION ====================
-        window.onload = function() {
-            console.log('🚀 Initializing NeonTrade...');
-            
-            // Initialize Firebase
-            initFirebase();
-            
-            // Check auth state
-            checkAuthState();
-            
-            // Hide loading after 1.5s
-            setTimeout(function() {
-                var loading = document.getElementById('loading-screen');
-                if (loading) {
-                    loading.style.opacity = '0';
-                    setTimeout(function() { loading.style.display = 'none'; }, 300);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let state = { balance: 0, price: 65420, candles: [], isLoginMode: true };
+        let currentUser = null;
+
+        // --- AUTH LOGIC ---
+        auth.onAuthStateChanged(user => {
+            document.getElementById('loading-screen').style.display = 'none';
+            if (user) {
+                currentUser = user;
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+                document.getElementById('user-display').innerText = 'UID: ' + user.uid.substr(0,8);
+                loadUserData();
+            } else {
+                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('app-content').style.display = 'none';
+            }
+        });
+
+        function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            if(!email || !pass) return alert("Fill all fields");
+
+            if(state.isLoginMode) {
+                auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
+            } else {
+                auth.createUserWithEmailAndPassword(email, pass).then(res => {
+                    db.ref('users/' + res.user.uid).set({ balance: 0, stats: {total:0, wins:0} });
+                }).catch(e => alert(e.message));
+            }
+        }
+
+        function toggleAuthMode() {
+            state.isLoginMode = !state.isLoginMode;
+            document.getElementById('auth-title').innerText = state.isLoginMode ? "ACCESS PORTAL" : "CREATE PROTOCOL";
+            document.getElementById('auth-toggle-text').innerHTML = state.isLoginMode ? 
+                'New Protocol? <a href="#" class="neon-text" onclick="toggleAuthMode()">Register UID</a>' : 
+                'Have ID? <a href="#" class="neon-text" onclick="toggleAuthMode()">Login</a>';
+        }
+
+        function logout() { auth.signOut(); }
+
+        // --- DATA LOGIC ---
+        function loadUserData() {
+            db.ref('users/' + currentUser.uid).on('value', snap => {
+                const data = snap.val();
+                if(data) {
+                    state.balance = data.balance || 0;
+                    updateUI();
                 }
-            }, 1500);
-            
-            // Setup chart
-            initChart();
-            setInterval(updateMarket, 1000);
-            window.addEventListener('resize', drawChart);
-            
-            // Setup all event listeners
-            setupEventListeners();
-            
-            console.log('✅ App initialized');
-        };
+            });
+        }
 
-        // ==================== EVENT LISTENERS ====================
-        function setupEventListeners() {
-            // Auth tabs
-            document.getElementById('tab-login').onclick = function() { switchAuthTab('login'); };
-            document.getElementById('tab-signup').onclick = function() { switchAuthTab('signup'); };
-            
-            // Auth forms
-            document.getElementById('loginForm').onsubmit = handleLogin;
-            document.getElementById('signupForm').onsubmit = handleSignup;
-            
-            // Demo button
-            document.getElementById('btnDemo').onclick = d
+        function updateUI() {
+            document.getElementById('wallet-balance').innerText = `₹${state.balance.toFixed(2)}`;
+        }
+
+        function switchView(viewId, el) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            el.classList.add('active');
+        }
+
+        // --- TRADE & CHART (Simplified) ---
+        function executeOrder(dir) {
+            if(state.balance < 100) return notify("Low Balance", "danger");
+            state.balance -= 100;
+            db.ref('users/' + currentUser.uid).update({ balance: state.balance });
+            notify(`Order Placed: ${dir}`, "info");
+            setTimeout(() => {
+                const win = Math.random() > 0.4;
+                if(win) {
+                    state.balance += 185;
+                    db.ref('users/' + currentUser.uid).update({ balance: state.balance });
+                    notify("WIN: +₹185", "success");
+                } else {
+                    notify("LOSS: -₹100", "danger");
+                }
+            }, 5000);
+        }
+
+        function submitDeposit() {
+            const amt = document.getElementById('dep-amt').value;
+            const utr = document.getElementById('dep-utr').value;
+            db.ref('deposits').push({ uid: currentUser.uid, email: currentUser.email, amt, utr, status: 'pending' });
+            alert("Deposit submitted for approval!");
+        }
+
+        function notify(msg, type) {
+            const log = document.getElementById('ai-log');
+            log.innerHTML = `<div class="text-${type}">> ${msg}</div>` + log.innerHTML;
+        }
+
+        // --- MINI CHART ENGINE ---
+        const canvas = document.getElementById('mainChart');
+        const ctx = canvas.getContext('2d');
+        function initChart() {
+            setInterval(() => {
+                state.price += (Math.random() - 0.5) * 10;
+                document.getElementById('live-price').innerText = state.price.toFixed(2);
+                drawChart();
+            }, 1000);
+        }
+
+        function drawChart() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.strokeStyle = "#00ff55";
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height/2);
+            for(let i=0; i<canvas.width; i+=10) {
+                ctx.lineTo(i, (canvas.height/2) + (Math.random()-0.5)*50);
+            }
+            ctx.stroke();
+        }
+
+        window.onload = () => { initChart(); };
+    </script>
+</body>
+        </html>
