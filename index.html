@@ -1,473 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonTrade Mobile • Green Protocol</title>
-    
-    <!-- External Assets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TradeX Pro – Binary Trading</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#0a0d14; --bg2:#0f1320; --bg3:#141927; --card:#161c2e;
+  --border:#1e2840; --green:#00e676; --green2:#00c853;
+  --red:#ff1744; --red2:#d50000; --blue:#448aff;
+  --gold:#ffd740; --text:#e8eaf6; --muted:#5c6680; --accent:#00e5ff;
+}
+html,body { width:100%; height:100%; background:var(--bg); color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; }
+.app { max-width:420px; margin:0 auto; height:100vh; display:flex; flex-direction:column; background:var(--bg); position:relative; overflow:hidden; }
 
-    <style>
-        :root {
-            --neon-green: #00ff55;
-            --neon-lime: #ccff00;
-            --dark-bg: #000000;
-            --glass: rgba(0, 255, 85, 0.08);
-            --border: rgba(0, 255, 85, 0.3);
-        }
+/* ── LOADING ── */
+#loadingOverlay { position:absolute; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+.loading-logo { font-family:'Orbitron',monospace; font-size:24px; font-weight:900; color:var(--accent); letter-spacing:4px; animation:glow 1.5s ease-in-out infinite alternate; }
+@keyframes glow { from{text-shadow:0 0 10px rgba(0,229,255,0.3)} to{text-shadow:0 0 30px rgba(0,229,255,0.8)} }
+.loading-bar { width:160px; height:3px; background:var(--border); border-radius:10px; overflow:hidden; }
+.loading-bar-fill { height:100%; background:linear-gradient(to right,var(--accent),var(--blue)); animation:load 1.5s ease-in-out infinite; }
+@keyframes load { 0%{width:0%} 60%{width:100%} 100%{width:100%} }
 
-        body {
-            background-color: var(--dark-bg);
-            background-image: radial-gradient(circle at top right, #0a200a, #000);
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding-bottom: 70px; /* Space for mobile nav */
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative;
-        }
+/* ── AUTH ── */
+#authScreen { position:absolute; inset:0; z-index:200; background:linear-gradient(160deg,#060910,#0a0d14,#070b18); display:none; flex-direction:column; align-items:center; justify-content:center; padding:28px 24px; overflow-y:auto; }
+.auth-glow { position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(0,229,255,0.08) 0%,transparent 70%); pointer-events:none; }
+.auth-logo { font-family:'Orbitron',monospace; font-size:28px; font-weight:900; color:var(--accent); letter-spacing:4px; text-shadow:0 0 30px rgba(0,229,255,0.5); margin-bottom:6px; }
+.auth-tagline { font-size:12px; color:var(--muted); letter-spacing:2px; margin-bottom:32px; }
+.auth-tabs { display:flex; margin-bottom:20px; border-radius:10px; overflow:hidden; border:1px solid var(--border); width:100%; }
+.auth-tab { flex:1; padding:10px; text-align:center; font-size:13px; font-weight:700; letter-spacing:1px; cursor:pointer; transition:all 0.2s; background:var(--bg3); color:var(--muted); }
+.auth-tab.active { background:rgba(0,229,255,0.12); color:var(--accent); }
+.auth-form { width:100%; display:flex; flex-direction:column; gap:11px; }
+.auth-input-wrap { position:relative; }
+.auth-input-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:0.4; }
+.auth-input { width:100%; padding:13px 14px 13px 40px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:600; outline:none; transition:border 0.2s; }
+.auth-input:focus { border-color:var(--accent); }
+.auth-input::placeholder { color:var(--muted); }
+.auth-btn { padding:13px; border-radius:10px; border:none; cursor:pointer; font-family:'Orbitron',monospace; font-size:13px; font-weight:700; letter-spacing:2px; transition:all 0.2s; width:100%; }
+.auth-btn-primary { background:linear-gradient(135deg,var(--accent),#0077ff); color:#000; box-shadow:0 4px 20px rgba(0,229,255,0.25); }
+.auth-btn-google { background:var(--bg3); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; gap:10px; }
+.auth-btn-google:hover { border-color:var(--accent); }
+.auth-divider { display:flex; align-items:center; gap:10px; }
+.auth-divider span { color:var(--muted); font-size:11px; white-space:nowrap; }
+.auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.auth-error { background:rgba(255,23,68,0.1); border:1px solid rgba(255,23,68,0.3); color:var(--red); border-radius:8px; padding:10px 14px; font-size:12px; font-weight:600; display:none; }
+.auth-error.show { display:block; }
+.auth-loader { display:none; width:20px; height:20px; border:2px solid rgba(0,0,0,0.3); border-top-color:#000; border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto; }
+@keyframes spin { to{transform:rotate(360deg)} }
 
-        .rajdhani { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; }
-        
-        /* Glassmorphism Components */
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+/* ── USER HEADER ── */
+#userHeader { display:none; align-items:center; gap:8px; padding:6px 14px; background:rgba(0,229,255,0.05); border-bottom:1px solid var(--border); font-size:12px; flex-shrink:0; }
+.avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--blue)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#000; overflow:hidden; flex-shrink:0; }
+.avatar img { width:100%; height:100%; object-fit:cover; }
+.user-name { font-weight:700; color:var(--text); flex:1; font-size:13px; }
+.logout-btn { padding:4px 10px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--muted); font-size:10px; cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:700; transition:all 0.2s; }
+.logout-btn:hover { border-color:var(--red); color:var(--red); }
 
-        .neon-text { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 85, 0.5); }
-        .neon-btn-buy { background: var(--neon-green); color: #000; font-weight: 700; border: none; }
-        .neon-btn-sell { background: #ff3333; color: #fff; font-weight: 700; border: none; }
+/* ── TOP BAR ── */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0; }
+.logo { font-family:'Orbitron',monospace; font-size:15px; font-weight:900; color:var(--accent); letter-spacing:2px; text-shadow:0 0 20px rgba(0,229,255,0.4); }
+.balance-wrap { text-align:center; }
+.balance-label { font-size:9px; color:var(--muted); letter-spacing:1px; }
+.balance-amount { font-family:'Orbitron',monospace; font-size:17px; font-weight:700; color:var(--gold); text-shadow:0 0 15px rgba(255,215,64,0.3); line-height:1.1; }
+.add-money-btn {
+  display:flex; align-items:center; gap:4px;
+  padding:6px 12px; border-radius:20px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,var(--green2),#00695c);
+  color:#fff; font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:0.5px; transition:all 0.2s;
+  box-shadow:0 2px 12px rgba(0,200,83,0.3);
+}
+.add-money-btn:hover { box-shadow:0 4px 18px rgba(0,200,83,0.5); }
+.add-money-btn svg { flex-shrink:0; }
 
-        /* Mobile Chart Height */
-        #chart-wrapper { height: 280px; width: 100%; position: relative; }
+/* ── TICKER ── */
+.ticker-wrap { background:rgba(0,229,255,0.05); border-bottom:1px solid var(--border); padding:5px 0; overflow:hidden; flex-shrink:0; }
+.ticker-inner { display:flex; gap:24px; animation:ticker 20s linear infinite; width:max-content; }
+.ticker-item { font-size:11px; font-weight:600; white-space:nowrap; }
+.ticker-item .up { color:var(--green); }
+.ticker-item .dn { color:var(--red); }
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-        /* Navigation Bar */
-        .mobile-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.9);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 1000;
-        }
-        .nav-item { color: #555; text-decoration: none; text-align: center; font-size: 0.7rem; transition: 0.2s; cursor: pointer; }
-        .nav-item.active { color: var(--neon-green); }
-        .nav-item i { font-size: 1.4rem; display: block; }
+/* ── ASSET BAR ── */
+.asset-bar { padding:8px 14px; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; gap:8px; overflow-x:auto; flex-shrink:0; scrollbar-width:none; }
+.asset-bar::-webkit-scrollbar { display:none; }
+.asset-chip { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:20px; border:1px solid var(--border); background:var(--bg3); cursor:pointer; white-space:nowrap; transition:all 0.2s; flex-shrink:0; }
+.asset-chip.active { background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(68,138,255,0.1)); border-color:var(--accent); box-shadow:0 0 12px rgba(0,229,255,0.15); }
+.asset-chip .sym { font-size:11px; font-weight:700; }
+.asset-chip .pct { font-size:10px; }
+.asset-chip .pct.up { color:var(--green); }
+.asset-chip .pct.dn { color:var(--red); }
+.asset-icon { width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; }
 
-        /* Loading Overlay */
-        #loading-screen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+/* ── CHART ── */
+.chart-wrap { flex:1; position:relative; overflow:hidden; background:var(--bg3); min-height:0; }
+.chart-header { position:absolute; top:0; left:0; right:0; padding:8px 14px; display:flex; align-items:center; justify-content:space-between; z-index:10; background:linear-gradient(to bottom,rgba(10,13,20,0.9),transparent); }
+.price-display { display:flex; flex-direction:column; }
+.price-big { font-family:'Orbitron',monospace; font-size:20px; font-weight:700; color:var(--green); text-shadow:0 0 20px rgba(0,230,118,0.4); line-height:1; }
+.price-big.dn { color:var(--red); text-shadow:0 0 20px rgba(255,23,68,0.4); }
+.price-change { font-size:10px; color:var(--muted); margin-top:2px; }
+.chart-controls { display:flex; gap:5px; }
+.ctrl-btn { background:rgba(30,40,64,0.8); border:1px solid var(--border); color:var(--muted); font-size:10px; padding:3px 7px; border-radius:6px; cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:600; transition:all 0.2s; }
+.ctrl-btn.active { border-color:var(--accent); color:var(--accent); }
+canvas#chart { width:100%; height:100%; display:block; }
+.payout-badge { position:absolute; top:48px; right:12px; background:linear-gradient(135deg,var(--green2),#00897b); color:#000; font-family:'Orbitron',monospace; font-size:12px; font-weight:900; padding:7px 10px; border-radius:10px; text-align:center; z-index:10; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 4px 20px rgba(0,200,83,0.3)} 50%{box-shadow:0 4px 30px rgba(0,200,83,0.5)} }
+.payout-badge small { display:block; font-size:7px; font-weight:400; color:rgba(0,0,0,0.7); }
+.timer-ring-wrap { position:absolute; bottom:50px; right:12px; z-index:10; }
+.timer-ring { position:relative; width:48px; height:48px; }
+.timer-ring svg { transform:rotate(-90deg); }
+.timer-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:'Orbitron',monospace; font-size:12px; font-weight:700; color:var(--accent); }
+.open-trade-bar { position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--border); z-index:20; }
+.open-trade-progress { height:100%; background:linear-gradient(to right,var(--accent),var(--green)); width:0%; transition:width 0.1s linear; }
+.notification { position:absolute; top:70px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); border-radius:12px; padding:9px 16px; font-size:12px; font-weight:600; letter-spacing:0.5px; z-index:100; opacity:0; transition:all 0.3s; white-space:nowrap; text-align:center; }
+.notification.show { opacity:1; }
+.notification.win { border-color:var(--green); color:var(--green); background:rgba(0,230,118,0.08); }
+.notification.loss { border-color:var(--red); color:var(--red); background:rgba(255,23,68,0.08); }
+.notification.info { border-color:var(--accent); color:var(--accent); }
 
-        /* Login Screen */
-        #login-screen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9998;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+/* ── TRADE PANEL ── */
+.trade-panel { background:var(--bg2); border-top:1px solid var(--border); padding:10px 14px; flex-shrink:0; }
+.time-row { display:flex; gap:5px; margin-bottom:8px; }
+.time-btn { flex:1; padding:6px 2px; border-radius:8px; border:1px solid var(--border); background:var(--bg3); color:var(--muted); font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; cursor:pointer; text-align:center; transition:all 0.2s; }
+.time-btn.active { background:rgba(0,229,255,0.1); border-color:var(--accent); color:var(--accent); }
+.amount-row { display:flex; align-items:center; gap:7px; margin-bottom:8px; }
+.amount-label { font-size:10px; color:var(--muted); letter-spacing:1px; flex-shrink:0; }
+.amount-ctrl { display:flex; align-items:center; flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.amt-btn { width:32px; height:32px; background:transparent; border:none; color:var(--text); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.amt-val { flex:1; text-align:center; font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--gold); background:transparent; border:none; outline:none; width:100%; }
+.quick-amts { display:flex; gap:4px; }
+.qa-btn { padding:4px 7px; border-radius:6px; border:1px solid var(--border); background:var(--bg3); color:var(--muted); font-size:10px; font-weight:700; cursor:pointer; font-family:'Rajdhani',sans-serif; transition:all 0.2s; }
+.qa-btn:hover { border-color:var(--gold); color:var(--gold); }
+.trade-btns { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.btn-up,.btn-dn { padding:12px; border-radius:12px; border:none; font-family:'Orbitron',monospace; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; letter-spacing:1px; transition:all 0.15s; }
+.btn-up { background:linear-gradient(135deg,var(--green2),#1b5e20); color:#fff; box-shadow:0 4px 20px rgba(0,200,83,0.25); }
+.btn-dn { background:linear-gradient(135deg,var(--red2),#7f0000); color:#fff; box-shadow:0 4px 20px rgba(213,0,0,0.25); }
+.btn-up:active,.btn-dn:active { transform:scale(0.97); }
 
-        /* Main App (hidden until login) */
-        #main-app {
-            display: none;
-        }
+/* ── BOTTOM NAV ── */
+.bottom-nav { display:flex; background:var(--bg2); border-top:1px solid var(--border); flex-shrink:0; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; padding:7px 4px; cursor:pointer; color:var(--muted); font-size:9px; letter-spacing:0.5px; font-weight:600; transition:color 0.2s; }
+.nav-item.active { color:var(--accent); }
+.nav-item svg { margin-bottom:2px; }
+.nav-dot { width:4px; height:4px; background:var(--accent); border-radius:50%; margin-top:2px; opacity:0; }
+.nav-item.active .nav-dot { opacity:1; }
 
-        .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* ══════════════════════════════════════════
+   WALLET PANEL (slide-up modal)
+══════════════════════════════════════════ */
+#walletPanel {
+  position:absolute; inset:0; z-index:150;
+  display:none; flex-direction:column;
+  background:var(--bg);
+  transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+#walletPanel.open { transform:translateY(0); display:flex; }
 
-        /* Wallet Specifics */
-        .balance-card { border-left: 5px solid var(--neon-green); }
-        .step-num { 
-            width: 25px; height: 25px; background: var(--neon-green); color: #000; 
-            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: bold; margin-right: 10px; font-size: 0.8rem;
-        }
+.wallet-header {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px; background:var(--bg2);
+  border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.wallet-back {
+  width:32px; height:32px; border-radius:8px; background:var(--bg3);
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text); font-size:18px; flex-shrink:0;
+}
+.wallet-title { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--accent); letter-spacing:2px; }
 
-        /* active trade amount highlight */
-        .btn-amt.active {
-            background-color: var(--neon-green) !important;
-            color: #000 !important;
-            border-color: var(--neon-green) !important;
-            font-weight: bold;
-        }
+/* Balance Card */
+.wallet-balance-card {
+  margin:16px 16px 0;
+  background:linear-gradient(135deg,#0d1526,#1a2440);
+  border:1px solid var(--border); border-radius:16px; padding:18px;
+  position:relative; overflow:hidden;
+}
+.wallet-balance-card::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:120px; height:120px; border-radius:50%;
+  background:radial-gradient(circle,rgba(0,229,255,0.08),transparent);
+}
+.wbal-label { font-size:11px; color:var(--muted); letter-spacing:1px; margin-bottom:4px; }
+.wbal-amount { font-family:'Orbitron',monospace; font-size:28px; font-weight:900; color:var(--gold); text-shadow:0 0 20px rgba(255,215,64,0.3); }
+.wbal-sub { font-size:10px; color:var(--muted); margin-top:4px; }
+.wbal-actions { display:flex; gap:10px; margin-top:14px; }
+.wbal-action-btn {
+  flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer;
+  font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:0.5px; display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:all 0.2s;
+}
+.wbal-dep { background:linear-gradient(135deg,var(--green2),#00695c); color:#fff; }
+.wbal-wit { background:var(--bg3); border:1px solid var(--border); color:var(--text); }
+.wbal-dep:hover { box-shadow:0 4px 16px rgba(0,200,83,0.3); }
+.wbal-wit:hover { border-color:var(--gold); color:var(--gold); }
 
-        /* Logout button */
-        #logout-btn {
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        #logout-btn:hover { color: var(--neon-green); }
-    </style>
-</head>
-<body>
+/* Wallet Tabs */
+.wallet-tabs { display:flex; margin:16px 16px 0; border-radius:10px; overflow:hidden; border:1px solid var(--border); flex-shrink:0; }
+.wallet-tab { flex:1; padding:10px; text-align:center; font-size:12px; font-weight:700; letter-spacing:0.5px; cursor:pointer; background:var(--bg3); color:var(--muted); transition:all 0.2s; }
+.wallet-tab.active { background:rgba(0,229,255,0.1); color:var(--accent); }
 
-    <!-- Startup Animation -->
-    <div id="loading-screen">
-        <div class="spinner-border text-success mb-3" role="status"></div>
-        <h2 class="rajdhani neon-text">NEON TRADE</h2>
-        <span class="text-secondary small">SECURE PROTOCOL V7.1</span>
-    </div>
+/* Wallet Content */
+.wallet-content { flex:1; overflow-y:auto; padding:16px; scrollbar-width:none; }
+.wallet-content::-webkit-scrollbar { display:none; }
 
-    <!-- Login Screen (hidden initially) -->
-    <div id="login-screen">
-        <div class="glass-panel" style="width: 90%; max-width: 320px; text-align: center;">
-            <h3 class="rajdhani neon-text mb-4">🔐 ACCESS PROTOCOL</h3>
-            <input type="text" id="login-username" class="form-control bg-dark text-white border-secondary mb-3" placeholder="Username / Email">
-            <input type="password" id="login-password" class="form-control bg-dark text-white border-secondary mb-3" placeholder="Password">
-            <button class="btn neon-btn-buy w-100 mb-2" onclick="handleLogin()">ENTER TRADE</button>
-            <button class="btn btn-outline-success w-100" onclick="guestLogin()">CONTINUE AS GUEST</button>
-            <div class="mt-3 text-secondary small">Use any credentials or guest</div>
-        </div>
-    </div>
+/* Section */
+.wsection { display:none; }
+.wsection.active { display:block; }
 
-    <!-- Main Application (hidden until login) -->
-    <div id="main-app">
-        <!-- Top Header -->
-        <header class="p-3 d-flex justify-content-between align-items-center">
-            <div>
-                <h5 class="rajdhani m-0">Protocol <span class="neon-text">Green</span></h5>
-                <small class="text-secondary" style="font-size: 0.6rem;">ID: 0x992...71B</small>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <div id="ai-badge" class="badge rounded-pill border border-secondary text-secondary">
-                    <i class="bi bi-cpu"></i> AI: OFF
-                </div>
-                <i class="bi bi-box-arrow-right fs-5" id="logout-btn" title="Logout" onclick="logout()"></i>
-            </div>
-        </header>
+/* Step cards */
+.step-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:16px; margin-bottom:14px;
+}
+.step-num {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--blue));
+  color:#000; font-family:'Orbitron',monospace; font-size:11px; font-weight:900;
+  margin-bottom:10px;
+}
+.step-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; }
 
-        <!-- MAIN VIEWS -->
-        <div class="container-fluid">
-            
-            <!-- 1. TRADE VIEW -->
-            <section id="view-trade" class="view-section active">
-                <div class="glass-panel text-center mb-3">
-                    <small class="text-secondary text-uppercase">BTC/USDT Market</small>
-                    <h2 class="rajdhani neon-text mb-0" id="live-price">65,420.00</h2>
-                </div>
+.insta-amount-row { display:flex; gap:8px; margin-bottom:12px; }
+.insta-input {
+  flex:1; padding:11px 14px; background:var(--bg3); border:1px solid var(--border);
+  border-radius:10px; color:var(--text); font-family:'Rajdhani',sans-serif;
+  font-size:15px; font-weight:700; outline:none; transition:border 0.2s;
+}
+.insta-input:focus { border-color:var(--accent); }
+.insta-input::placeholder { color:var(--muted); }
 
-                <div id="chart-wrapper" class="glass-panel">
-                    <canvas id="mainChart"></canvas>
-                </div>
+.insta-link-btn {
+  width:100%; padding:13px; border-radius:12px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,#ff6b35,#ff4500);
+  color:#fff; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  letter-spacing:0.5px; transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(255,69,0,0.3);
+}
+.insta-link-btn:hover { box-shadow:0 6px 22px rgba(255,69,0,0.5); }
 
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <button class="btn btn-dark w-100 border-secondary small py-2 btn-amt" onclick="setTradeAmt(100, this)">₹100</button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-dark w-100 border-secondary small py-2 btn-amt" onclick="setTradeAmt(500, this)">₹500</button>
-                    </div>
-                </div>
+.amount-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+.amount-chip {
+  padding:6px 14px; border-radius:20px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--muted); font-size:12px; font-weight:700;
+  cursor:pointer; transition:all 0.2s;
+}
+.amount-chip:hover,.amount-chip.sel { border-color:var(--accent); color:var(--accent); background:rgba(0,229,255,0.08); }
 
-                <div class="row g-3">
-                    <div class="col-6">
-                        <button class="btn neon-btn-buy w-100 py-3" onclick="executeOrder('BUY')">
-                            <i class="bi bi-graph-up-arrow"></i> LONG
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn neon-btn-sell w-100 py-3" onclick="executeOrder('SELL')">
-                            <i class="bi bi-graph-down-arrow"></i> SHORT
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="active-orders" class="mt-4"></div>
-            </section>
+.step2-divider { display:flex; align-items:center; gap:8px; margin:8px 0; }
+.step2-divider::before,.step2-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.step2-divider span { font-size:10px; color:var(--muted); }
 
-            <!-- 2. WALLET VIEW -->
-            <section id="view-wallet" class="view-section">
-                <div class="glass-panel balance-card mb-4" data-aos="fade-right">
-                    <p class="text-secondary small mb-1">CURRENT BALANCE</p>
-                    <h1 class="rajdhani display-5" id="wallet-balance">₹0</h1>
-                </div>
+.submit-btn {
+  width:100%; padding:13px; border-radius:12px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),#0077ff);
+  color:#000; font-family:'Orbitron',monospace; font-size:12px; font-weight:900;
+  letter-spacing:1px; transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(0,229,255,0.25);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.submit-btn:hover { box-shadow:0 6px 22px rgba(0,229,255,0.4); }
+.submit-btn:disabled { opacity:0.5; cursor:not-allowed; }
 
-                <h5 class="rajdhani mb-3 text-success"><i class="bi bi-plus-square"></i> Deposit Money</h5>
-                
-                <div class="glass-panel border-success mb-3">
-                    <div class="mb-3">
-                        <p class="small mb-2"><span class="step-num">1</span> Enter Amount & Pay</p>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary text-success">₹</span>
-                            <input type="number" id="deposit-input" class="form-control bg-dark text-white border-secondary" placeholder="Amount">
-                        </div>
-                        <a href="https://www.instamojo.com/@rajeshjani121/" target="_blank" class="btn btn-outline-success w-100 btn-sm">
-                            OPEN INSTAMOJO LINK <i class="bi bi-box-arrow-up-right"></i>
-                        </a>
-                    </div>
+/* Status badge */
+.status-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.5px; }
+.status-pending { background:rgba(255,215,64,0.1); color:var(--gold); border:1px solid rgba(255,215,64,0.3); }
+.status-approved { background:rgba(0,230,118,0.1); color:var(--green); border:1px solid rgba(0,230,118,0.3); }
+.status-rejected { background:rgba(255,23,68,0.1); color:var(--red); border:1px solid rgba(255,23,68,0.3); }
 
-                    <hr class="border-secondary">
-
-                    <div>
-                        <p class="small mb-2"><span class="step-num">2</span> Submit Payment ID / UTR</p>
-                        <input type="text" id="utr-input" class="form-control bg-dark text-white border-secondary mb-2" placeholder="Payment ID">
-                        <button class="btn neon-btn-buy w-100 btn-sm" onclick="submitDeposit()">SUBMIT FOR APPROVAL</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. STATS VIEW -->
-            <section id="view-stats" class="view-section">
-                <h5 class="rajdhani neon-text mb-3">Operational Stats</h5>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="glass-panel text-center">
-                            <small class="text-secondary d-block">Total Trades</small>
-                            <span class="h4 rajdhani" id="stat-total">0</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="glass-panel text-center">
-                            <small class="text-secondary d-block">Win Rate</small>
-                            <span class="h4 rajdhani text-success" id="stat-winrate">0%</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="glass-panel mt-3">
-                    <p class="small text-secondary mb-2 text-uppercase">AI Analysis Log</p>
-                    <div id="ai-log" class="small text-info" style="font-family: monospace; max-height: 150px; overflow-y: auto;"></div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <nav class="mobile-nav">
-            <a class="nav-item active" onclick="switchView('trade', this)">
-                <i class="bi bi-graph-up"></i>Trade
-            </a>
-            <a class="nav-item" onclick="switchView('wallet', this)">
-                <i class="bi bi-wallet2"></i>Wallet
-            </a>
-            <a class="nav-item" onclick="switchView('stats', this)">
-                <i class="bi bi-cpu"></i>AI Pattern
-            </a>
-        </nav>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
-    <script>
-        // --- APP STATE ---
-        let state = {
-            balance: 2500,          // starting demo balance
-            price: 65420,
-            candles: [],
-            stats: { total: 0, wins: 0 },
-            tradeAmt: 100,
-            aiEnabled: false
-        };
-
-        // DOM elements
-        const livePriceEl = document.getElementById('live-price');
-        const walletBalanceEl = document.getElementById('wallet-balance');
-        const statTotalEl = document.getElementById('stat-total');
-        const statWinrateEl = document.getElementById('stat-winrate');
-        const aiLogEl = document.getElementById('ai-log');
-        const aiBadge = document.getElementById('ai-badge');
-        const activeOrdersDiv = document.getElementById('active-orders');
-        const canvas = document.getElementById('mainChart');
-        const ctx = canvas.getContext('2d');
-        const loadingScreen = document.getElementById('loading-screen');
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
-
-        // --- LOGIN / LOGOUT FLOW ---
-        window.onload = () => {
-            AOS.init();
-            // Simulate loading, then show login
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                loginScreen.style.display = 'flex';  // show login
-            }, 2000);
-        };
-
-        function handleLogin() {
-            // Accept any non-empty username/password for demo
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            if (username === '' || password === '') {
-                alert('Please enter any username and password (or use guest)');
-                return;
-            }
-            // Success
-            loginScreen.style.display = 'none';
-            mainApp.style.display = 'block';
-            initApp(); // start chart and intervals
-        }
-
-        function guestLogin() {
-            loginScreen.style.display = 'none';
-            mainApp.style.display = 'block';
-            initApp();
-        }
-
-        function logout() {
-            // stop intervals? we'll re-init on login anyway, but simple: reload or just hide
-            mainApp.style.display = 'none';
-            loginScreen.style.display = 'flex';
-            // clear any running intervals by reloading? but we can just re-init after login
-            // For simplicity, we'll let the user log back in and restart.
-            // We'll reset state a bit.
-            state = {
-                balance: 2500,
-                price: 65420,
-                candles: [],
-                stats: { total: 0, wins: 0 },
-                tradeAmt: 100,
-                aiEnabled: false
-            };
-            // Clear logs
-            aiLogEl.innerHTML = '';
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-trade').classList.add('active');
-            document.querySelectorAll('.nav-item').forEach((n,i) => {
-                n.classList.toggle('active', i===0);
-            });
-            // reset AI badge
-            aiBadge.classList = 'badge rounded-pill border border-secondary text-secondary';
-            aiBadge.innerHTML = `<i class="bi bi-cpu"></i> AI: OFF`;
-            // Clear active orders
-            activeOrdersDiv.innerHTML = '';
-            updateUI();
-        }
-
-        // Initialize app after login (chart & intervals)
-        function initApp() {
-            initChart();
-            updateUI();
-            // highlight default trade amount button
-            document.querySelectorAll('.btn-amt')[0]?.classList.add('active');
-        }
-
-        // --- CORE LOGIC (unchanged but ensure intervals don't double) ---
-        let marketInterval, candleInterval;
-        function initChart() {
-            // Clear any previous intervals
-            if (marketInterval) clearInterval(marketInterval);
-            if (candleInterval) clearInterval(candleInterval);
-            
-            // generate initial candles
-            for(let i=0; i<45; i++) {
-                addCandle(true);
-            }
-            // start market updates (price moves every 1s)
-            marketInterval = setInterval(updateMarket, 1000);
-            // add new candle every 8 seconds
-            candleInterval = setInterval(() => { addCandle(); drawChart(); }, 8000);
-        }
-
-        // --- REST OF THE CODE (same as before, copy-pasted) ---
-
-        // Navigation
-        function switchView(viewId, el) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            el.classList.add('active');
-
-            if(viewId === 'stats') {
-                enableAI(); // Auto-trigger AI simulation when checking stats
-            }
-            // redraw chart if trade view becomes active (fix sizing)
-            if(viewId === 'trade') drawChart();
-        }
-
-        // --- WALLET & TRADE AMOUNT ---
-        function setTradeAmt(val, btn) {
-            state.tradeAmt = val;
-            document.querySelectorAll('.btn-amt').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            notify(`Trade amount set: ₹${val}`);
-        }
-
-        function submitDeposit() {
-            const amt = document.getElementById('deposit-input').value;
-            const utr = document.getElementById('utr-input').value;
-            if(!amt || !utr) return alert("Please fill all steps.");
-
-            notify("Payment ID Submitted. Processing...", "secondary");
-            
-            // Simulate approval after 5 seconds
-            setTimeout(() => {
-                state.balance += parseFloat(amt);
-                updateUI();
-                notify(`CREDIT CONFIRMED: +₹${amt}`, "success");
-                document.getElementById('deposit-input').value = '';
-                document.getElementById('utr-input').value = '';
-            }, 5000);
-        }
-
-        // --- TRADING ---
-        function executeOrder(direction) {
-            if(state.balance < state.tradeAmt) {
-                notify("Insufficient Credits! Please Top-up Wallet.", "danger");
-                return;
-            }
-
-            state.balance -= state.tradeAmt;
-            updateUI();
-
-            const entryPrice = state.price;
-            const orderId = 'ord_' + Date.now() + Math.random().toString(36).substr(2, 4);
-            
-            const orderDiv = document.createElement('div');
-            orderDiv.className = 'glass-panel p-2 mb-2 d-flex justify-content-between align-items-center border-warning';
-            orderDiv.id = orderId;
-            orderDiv.innerHTML = `
-                <span><i class="bi bi-clock-history"></i> ${direction} @ ${entryPrice.toFixed(2)}</span>
-                <span class="text-warning small">Running (10s)...</span>
-            `;
-            activeOrdersDiv.prepend(orderDiv);
-
-            // 10 Second Expiry
-            setTimeout(() => {
-                const exitPrice = state.price;
-                let isWin = false;
-                
-                if(direction === 'BUY' && exitPrice > entryPrice) isWin = true;
-                if(direction === 'SELL' && exitPrice < entryPrice) isWin = true;
-
-                // FORCE AI WIN LOGIC (if active)
-                if(state.aiEnabled) isWin = true;
-
-                // remove order from UI
-                const orderElem = document.getElementById(orderId);
-                if(orderElem) orderElem.remove();
-
-                resolveTrade(isWin, state.tradeAmt);
-            }, 10000);
-        }
-
-        function resolveTrade(win, amt) {
-            state.stats.total++;
-            if(win) {
-                const profit = amt * 1.85;  // 85% return
- 
+/* History item */
+.hist-item { display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg3); border-radius:12px; margin-bottom:8px; border:1px solid var(--b
