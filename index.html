@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonTrade - Secure Protocol</title>
+    <title>NeonTrade Mobile • Green Protocol</title>
     
-    <!-- CSS Assets -->
+    <!-- External Assets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-
     <style>
         :root {
             --neon-green: #00ff55;
+            --neon-lime: #ccff00;
             --dark-bg: #000000;
             --glass: rgba(0, 255, 85, 0.08);
             --border: rgba(0, 255, 85, 0.3);
@@ -30,263 +26,448 @@
             color: #fff;
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding-bottom: 80px;
+            padding-bottom: 70px; /* Space for mobile nav */
             overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
         }
 
         .rajdhani { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; }
-        .neon-text { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 85, 0.5); }
-        .glass-panel { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 15px; padding: 15px; }
+        
+        /* Glassmorphism Components */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
 
-        /* Login Overlay */
-        #auth-screen {
+        .neon-text { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 85, 0.5); }
+        .neon-btn-buy { background: var(--neon-green); color: #000; font-weight: 700; border: none; }
+        .neon-btn-sell { background: #ff3333; color: #fff; font-weight: 700; border: none; }
+
+        /* Mobile Chart Height */
+        #chart-wrapper { height: 280px; width: 100%; position: relative; }
+
+        /* Navigation Bar */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        .nav-item { color: #555; text-decoration: none; text-align: center; font-size: 0.7rem; transition: 0.2s; cursor: pointer; }
+        .nav-item.active { color: var(--neon-green); }
+        .nav-item i { font-size: 1.4rem; display: block; }
+
+        /* Loading Overlay */
+        #loading-screen {
             position: fixed;
             inset: 0;
             background: #000;
-            z-index: 10000;
+            z-index: 9999;
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9998;
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
 
-        .auth-card { width: 100%; max-width: 400px; padding: 30px; border: 1px solid var(--neon-green); box-shadow: 0 0 20px rgba(0, 255, 85, 0.2); }
-        .form-control { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; }
-        .form-control:focus { background: rgba(255,255,255,0.1); border-color: var(--neon-green); color: #fff; box-shadow: none; }
+        /* Main App (hidden until login) */
+        #main-app {
+            display: none;
+        }
 
-        /* App Layout */
-        #app-content { display: none; }
-        .view-section { display: none; padding: 10px; }
+        .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
-        .nav-item { color: #555; text-decoration: none; text-align: center; font-size: 0.7rem; }
-        .nav-item.active { color: var(--neon-green); }
-        .nav-item i { font-size: 1.5rem; display: block; }
+        /* Wallet Specifics */
+        .balance-card { border-left: 5px solid var(--neon-green); }
+        .step-num { 
+            width: 25px; height: 25px; background: var(--neon-green); color: #000; 
+            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+            font-weight: bold; margin-right: 10px; font-size: 0.8rem;
+        }
 
-        #loading-screen { position: fixed; inset: 0; background: #000; z-index: 11000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* active trade amount highlight */
+        .btn-amt.active {
+            background-color: var(--neon-green) !important;
+            color: #000 !important;
+            border-color: var(--neon-green) !important;
+            font-weight: bold;
+        }
+
+        /* Logout button */
+        #logout-btn {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        #logout-btn:hover { color: var(--neon-green); }
     </style>
 </head>
 <body>
 
-    <!-- Loading Screen -->
+    <!-- Startup Animation -->
     <div id="loading-screen">
-        <div class="spinner-border text-success mb-3"></div>
-        <h4 class="rajdhani neon-text">NEON TRADE</h4>
+        <div class="spinner-border text-success mb-3" role="status"></div>
+        <h2 class="rajdhani neon-text">NEON TRADE</h2>
+        <span class="text-secondary small">SECURE PROTOCOL V7.1</span>
     </div>
 
-    <!-- AUTHENTICATION SCREEN -->
-    <div id="auth-screen">
-        <div class="auth-card glass-panel text-center">
-            <h2 class="rajdhani neon-text mb-4" id="auth-title">ACCESS PORTAL</h2>
-            
-            <input type="email" id="auth-email" class="form-control mb-3" placeholder="Neural Email">
-            <input type="password" id="auth-pass" class="form-control mb-4" placeholder="Security Key">
-            
-            <button class="btn btn-success w-100 fw-bold mb-3 py-2" onclick="handleAuth()">INITIALIZE LINK</button>
-            <p class="small text-secondary" id="auth-toggle-text">
-                New Protocol? <a href="javascript:void(0)" class="neon-text" onclick="toggleAuthMode()">Register UID</a>
-            </p>
+    <!-- Login Screen (hidden initially) -->
+    <div id="login-screen">
+        <div class="glass-panel" style="width: 90%; max-width: 320px; text-align: center;">
+            <h3 class="rajdhani neon-text mb-4">🔐 ACCESS PROTOCOL</h3>
+            <input type="text" id="login-username" class="form-control bg-dark text-white border-secondary mb-3" placeholder="Username / Email">
+            <input type="password" id="login-password" class="form-control bg-dark text-white border-secondary mb-3" placeholder="Password">
+            <button class="btn neon-btn-buy w-100 mb-2" onclick="handleLogin()">ENTER TRADE</button>
+            <button class="btn btn-outline-success w-100" onclick="guestLogin()">CONTINUE AS GUEST</button>
+            <div class="mt-3 text-secondary small">Use any credentials or guest</div>
         </div>
     </div>
 
-    <!-- MAIN APP CONTENT -->
-    <div id="app-content">
+    <!-- Main Application (hidden until login) -->
+    <div id="main-app">
+        <!-- Top Header -->
         <header class="p-3 d-flex justify-content-between align-items-center">
             <div>
                 <h5 class="rajdhani m-0">Protocol <span class="neon-text">Green</span></h5>
-                <small class="text-secondary" id="user-display" style="font-size: 0.6rem;">UID: ...</small>
+                <small class="text-secondary" style="font-size: 0.6rem;">ID: 0x992...71B</small>
             </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="logout()"><i class="bi bi-power"></i></button>
+            <div class="d-flex align-items-center gap-3">
+                <div id="ai-badge" class="badge rounded-pill border border-secondary text-secondary">
+                    <i class="bi bi-cpu"></i> AI: OFF
+                </div>
+                <i class="bi bi-box-arrow-right fs-5" id="logout-btn" title="Logout" onclick="logout()"></i>
+            </div>
         </header>
 
-        <main class="container-fluid">
-            <!-- TRADE VIEW -->
+        <!-- MAIN VIEWS -->
+        <div class="container-fluid">
+            
+            <!-- 1. TRADE VIEW -->
             <section id="view-trade" class="view-section active">
                 <div class="glass-panel text-center mb-3">
-                    <small class="text-secondary text-uppercase">Live BTC/USDT</small>
+                    <small class="text-secondary text-uppercase">BTC/USDT Market</small>
                     <h2 class="rajdhani neon-text mb-0" id="live-price">65,420.00</h2>
                 </div>
-                <div class="glass-panel p-1 mb-3">
-                    <canvas id="mainChart" style="height: 250px; width: 100%;"></canvas>
+
+                <div id="chart-wrapper" class="glass-panel">
+                    <canvas id="mainChart"></canvas>
                 </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <button class="btn btn-dark w-100 border-secondary small py-2 btn-amt" onclick="setTradeAmt(100, this)">₹100</button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-dark w-100 border-secondary small py-2 btn-amt" onclick="setTradeAmt(500, this)">₹500</button>
+                    </div>
+                </div>
+
                 <div class="row g-3">
-                    <div class="col-6"><button class="btn btn-success w-100 py-3 fw-bold" onclick="executeOrder('BUY')">CALL</button></div>
-                    <div class="col-6"><button class="btn btn-danger w-100 py-3 fw-bold" onclick="executeOrder('SELL')">PUT</button></div>
+                    <div class="col-6">
+                        <button class="btn neon-btn-buy w-100 py-3" onclick="executeOrder('BUY')">
+                            <i class="bi bi-graph-up-arrow"></i> LONG
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn neon-btn-sell w-100 py-3" onclick="executeOrder('SELL')">
+                            <i class="bi bi-graph-down-arrow"></i> SHORT
+                        </button>
+                    </div>
                 </div>
+                
                 <div id="active-orders" class="mt-4"></div>
             </section>
 
-            <!-- WALLET VIEW -->
+            <!-- 2. WALLET VIEW -->
             <section id="view-wallet" class="view-section">
-                <div class="glass-panel border-start border-4 border-success mb-4">
-                    <p class="text-secondary small mb-1">CREDIT BALANCE</p>
-                    <h1 class="rajdhani display-5" id="wallet-balance">₹0.00</h1>
+                <div class="glass-panel balance-card mb-4" data-aos="fade-right">
+                    <p class="text-secondary small mb-1">CURRENT BALANCE</p>
+                    <h1 class="rajdhani display-5" id="wallet-balance">₹0</h1>
                 </div>
-                <div class="glass-panel border-secondary">
-                    <h6 class="rajdhani text-success mb-3">Deposit Credits</h6>
-                    <input type="number" id="dep-amt" class="form-control bg-dark text-white mb-2" placeholder="Amount">
-                    <a href="https://www.instamojo.com/@rajeshjani121/" target="_blank" class="btn btn-outline-success btn-sm w-100 mb-3">PAY VIA INSTAMOJO</a>
-                    <input type="text" id="dep-utr" class="form-control bg-dark text-white mb-2" placeholder="Transaction ID / UTR">
-                    <button class="btn btn-success w-100" onclick="submitDeposit()">SUBMIT FOR APPROVAL</button>
-                </div>
-            </section>
 
-            <!-- STATS VIEW -->
-            <section id="view-stats" class="view-section">
-                <h5 class="rajdhani neon-text mb-3">Performance Log</h5>
-                <div class="glass-panel mb-3">
-                    <div id="ai-log" class="small text-info" style="font-family: monospace; height: 200px; overflow-y: auto;">
-                        > SYSTEM READY...
+                <h5 class="rajdhani mb-3 text-success"><i class="bi bi-plus-square"></i> Deposit Money</h5>
+                
+                <div class="glass-panel border-success mb-3">
+                    <div class="mb-3">
+                        <p class="small mb-2"><span class="step-num">1</span> Enter Amount & Pay</p>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text bg-dark border-secondary text-success">₹</span>
+                            <input type="number" id="deposit-input" class="form-control bg-dark text-white border-secondary" placeholder="Amount">
+                        </div>
+                        <a href="https://www.instamojo.com/@rajeshjani121/" target="_blank" class="btn btn-outline-success w-100 btn-sm">
+                            OPEN INSTAMOJO LINK <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </div>
+
+                    <hr class="border-secondary">
+
+                    <div>
+                        <p class="small mb-2"><span class="step-num">2</span> Submit Payment ID / UTR</p>
+                        <input type="text" id="utr-input" class="form-control bg-dark text-white border-secondary mb-2" placeholder="Payment ID">
+                        <button class="btn neon-btn-buy w-100 btn-sm" onclick="submitDeposit()">SUBMIT FOR APPROVAL</button>
                     </div>
                 </div>
             </section>
-        </main>
 
+            <!-- 3. STATS VIEW -->
+            <section id="view-stats" class="view-section">
+                <h5 class="rajdhani neon-text mb-3">Operational Stats</h5>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="glass-panel text-center">
+                            <small class="text-secondary d-block">Total Trades</small>
+                            <span class="h4 rajdhani" id="stat-total">0</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="glass-panel text-center">
+                            <small class="text-secondary d-block">Win Rate</small>
+                            <span class="h4 rajdhani text-success" id="stat-winrate">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-panel mt-3">
+                    <p class="small text-secondary mb-2 text-uppercase">AI Analysis Log</p>
+                    <div id="ai-log" class="small text-info" style="font-family: monospace; max-height: 150px; overflow-y: auto;"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Bottom Navigation -->
         <nav class="mobile-nav">
-            <a href="javascript:void(0)" class="nav-item active" onclick="switchView('trade', this)"><i class="bi bi-graph-up"></i>Trade</a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchView('wallet', this)"><i class="bi bi-wallet2"></i>Wallet</a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchView('stats', this)"><i class="bi bi-cpu"></i>AI</a>
+            <a class="nav-item active" onclick="switchView('trade', this)">
+                <i class="bi bi-graph-up"></i>Trade
+            </a>
+            <a class="nav-item" onclick="switchView('wallet', this)">
+                <i class="bi bi-wallet2"></i>Wallet
+            </a>
+            <a class="nav-item" onclick="switchView('stats', this)">
+                <i class="bi bi-cpu"></i>AI Pattern
+            </a>
         </nav>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
     <script>
-        // --- FIREBASE CONFIG ---
-        const firebaseConfig = {
-  apiKey: "AIzaSyCHZ4_PhE2gbJBDzipArubqJpHW88Alw5o",
-  authDomain: "tournament-62f77.firebaseapp.com",
-  databaseURL: "https://tournament-62f77-default-rtdb.firebaseio.com",
-  projectId: "tournament-62f77",
-  storageBucket: "tournament-62f77.firebasestorage.app",
-  messagingSenderId: "59905181993",
-  appId: "1:59905181993:web:8ad4f721ac50c09c478f38",
-  measurementId: "G-QHHJ1BJWMP"
-};
+        // --- APP STATE ---
+        let state = {
+            balance: 2500,          // starting demo balance
+            price: 65420,
+            candles: [],
+            stats: { total: 0, wins: 0 },
+            tradeAmt: 100,
+            aiEnabled: false
+        };
 
+        // DOM elements
+        const livePriceEl = document.getElementById('live-price');
+        const walletBalanceEl = document.getElementById('wallet-balance');
+        const statTotalEl = document.getElementById('stat-total');
+        const statWinrateEl = document.getElementById('stat-winrate');
+        const aiLogEl = document.getElementById('ai-log');
+        const aiBadge = document.getElementById('ai-badge');
+        const activeOrdersDiv = document.getElementById('active-orders');
+        const canvas = document.getElementById('mainChart');
+        const ctx = canvas.getContext('2d');
+        const loadingScreen = document.getElementById('loading-screen');
+        const loginScreen = document.getElementById('login-screen');
+        const mainApp = document.getElementById('main-app');
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        // --- LOGIN / LOGOUT FLOW ---
+        window.onload = () => {
+            AOS.init();
+            // Simulate loading, then show login
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                loginScreen.style.display = 'flex';  // show login
+            }, 2000);
+        };
 
-        let state = { balance: 0, price: 65420, candles: [], isLoginMode: true };
-        let currentUser = null;
-
-        // --- AUTH LOGIC ---
-        auth.onAuthStateChanged(user => {
-            document.getElementById('loading-screen').style.display = 'none';
-            if (user) {
-                currentUser = user;
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('app-content').style.display = 'block';
-                document.getElementById('user-display').innerText = 'UID: ' + user.uid.substr(0,8);
-                loadUserData();
-            } else {
-                document.getElementById('auth-screen').style.display = 'flex';
-                document.getElementById('app-content').style.display = 'none';
+        function handleLogin() {
+            // Accept any non-empty username/password for demo
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            if (username === '' || password === '') {
+                alert('Please enter any username and password (or use guest)');
+                return;
             }
-        });
-
-        function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-            if(!email || !pass) return alert("Fill all fields");
-
-            if(state.isLoginMode) {
-                auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
-            } else {
-                auth.createUserWithEmailAndPassword(email, pass).then(res => {
-                    db.ref('users/' + res.user.uid).set({ balance: 0, stats: {total:0, wins:0} });
-                }).catch(e => alert(e.message));
-            }
+            // Success
+            loginScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            initApp(); // start chart and intervals
         }
 
-        function toggleAuthMode() {
-            state.isLoginMode = !state.isLoginMode;
-            document.getElementById('auth-title').innerText = state.isLoginMode ? "ACCESS PORTAL" : "CREATE PROTOCOL";
-            document.getElementById('auth-toggle-text').innerHTML = state.isLoginMode ? 
-                'New Protocol? <a href="#" class="neon-text" onclick="toggleAuthMode()">Register UID</a>' : 
-                'Have ID? <a href="#" class="neon-text" onclick="toggleAuthMode()">Login</a>';
+        function guestLogin() {
+            loginScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            initApp();
         }
 
-        function logout() { auth.signOut(); }
-
-        // --- DATA LOGIC ---
-        function loadUserData() {
-            db.ref('users/' + currentUser.uid).on('value', snap => {
-                const data = snap.val();
-                if(data) {
-                    state.balance = data.balance || 0;
-                    updateUI();
-                }
+        function logout() {
+            // stop intervals? we'll re-init on login anyway, but simple: reload or just hide
+            mainApp.style.display = 'none';
+            loginScreen.style.display = 'flex';
+            // clear any running intervals by reloading? but we can just re-init after login
+            // For simplicity, we'll let the user log back in and restart.
+            // We'll reset state a bit.
+            state = {
+                balance: 2500,
+                price: 65420,
+                candles: [],
+                stats: { total: 0, wins: 0 },
+                tradeAmt: 100,
+                aiEnabled: false
+            };
+            // Clear logs
+            aiLogEl.innerHTML = '';
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('view-trade').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach((n,i) => {
+                n.classList.toggle('active', i===0);
             });
+            // reset AI badge
+            aiBadge.classList = 'badge rounded-pill border border-secondary text-secondary';
+            aiBadge.innerHTML = `<i class="bi bi-cpu"></i> AI: OFF`;
+            // Clear active orders
+            activeOrdersDiv.innerHTML = '';
+            updateUI();
         }
 
-        function updateUI() {
-            document.getElementById('wallet-balance').innerText = `₹${state.balance.toFixed(2)}`;
+        // Initialize app after login (chart & intervals)
+        function initApp() {
+            initChart();
+            updateUI();
+            // highlight default trade amount button
+            document.querySelectorAll('.btn-amt')[0]?.classList.add('active');
         }
 
+        // --- CORE LOGIC (unchanged but ensure intervals don't double) ---
+        let marketInterval, candleInterval;
+        function initChart() {
+            // Clear any previous intervals
+            if (marketInterval) clearInterval(marketInterval);
+            if (candleInterval) clearInterval(candleInterval);
+            
+            // generate initial candles
+            for(let i=0; i<45; i++) {
+                addCandle(true);
+            }
+            // start market updates (price moves every 1s)
+            marketInterval = setInterval(updateMarket, 1000);
+            // add new candle every 8 seconds
+            candleInterval = setInterval(() => { addCandle(); drawChart(); }, 8000);
+        }
+
+        // --- REST OF THE CODE (same as before, copy-pasted) ---
+
+        // Navigation
         function switchView(viewId, el) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`view-${viewId}`).classList.add('active');
             el.classList.add('active');
+
+            if(viewId === 'stats') {
+                enableAI(); // Auto-trigger AI simulation when checking stats
+            }
+            // redraw chart if trade view becomes active (fix sizing)
+            if(viewId === 'trade') drawChart();
         }
 
-        // --- TRADE & CHART (Simplified) ---
-        function executeOrder(dir) {
-            if(state.balance < 100) return notify("Low Balance", "danger");
-            state.balance -= 100;
-            db.ref('users/' + currentUser.uid).update({ balance: state.balance });
-            notify(`Order Placed: ${dir}`, "info");
-            setTimeout(() => {
-                const win = Math.random() > 0.4;
-                if(win) {
-                    state.balance += 185;
-                    db.ref('users/' + currentUser.uid).update({ balance: state.balance });
-                    notify("WIN: +₹185", "success");
-                } else {
-                    notify("LOSS: -₹100", "danger");
-                }
-            }, 5000);
+        // --- WALLET & TRADE AMOUNT ---
+        function setTradeAmt(val, btn) {
+            state.tradeAmt = val;
+            document.querySelectorAll('.btn-amt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            notify(`Trade amount set: ₹${val}`);
         }
 
         function submitDeposit() {
-            const amt = document.getElementById('dep-amt').value;
-            const utr = document.getElementById('dep-utr').value;
-            db.ref('deposits').push({ uid: currentUser.uid, email: currentUser.email, amt, utr, status: 'pending' });
-            alert("Deposit submitted for approval!");
+            const amt = document.getElementById('deposit-input').value;
+            const utr = document.getElementById('utr-input').value;
+            if(!amt || !utr) return alert("Please fill all steps.");
+
+            notify("Payment ID Submitted. Processing...", "secondary");
+            
+            // Simulate approval after 5 seconds
+            setTimeout(() => {
+                state.balance += parseFloat(amt);
+                updateUI();
+                notify(`CREDIT CONFIRMED: +₹${amt}`, "success");
+                document.getElementById('deposit-input').value = '';
+                document.getElementById('utr-input').value = '';
+            }, 5000);
         }
 
-        function notify(msg, type) {
-            const log = document.getElementById('ai-log');
-            log.innerHTML = `<div class="text-${type}">> ${msg}</div>` + log.innerHTML;
-        }
-
-        // --- MINI CHART ENGINE ---
-        const canvas = document.getElementById('mainChart');
-        const ctx = canvas.getContext('2d');
-        function initChart() {
-            setInterval(() => {
-                state.price += (Math.random() - 0.5) * 10;
-                document.getElementById('live-price').innerText = state.price.toFixed(2);
-                drawChart();
-            }, 1000);
-        }
-
-        function drawChart() {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            ctx.strokeStyle = "#00ff55";
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height/2);
-            for(let i=0; i<canvas.width; i+=10) {
-                ctx.lineTo(i, (canvas.height/2) + (Math.random()-0.5)*50);
+        // --- TRADING ---
+        function executeOrder(direction) {
+            if(state.balance < state.tradeAmt) {
+                notify("Insufficient Credits! Please Top-up Wallet.", "danger");
+                return;
             }
-            ctx.stroke();
+
+            state.balance -= state.tradeAmt;
+            updateUI();
+
+            const entryPrice = state.price;
+            const orderId = 'ord_' + Date.now() + Math.random().toString(36).substr(2, 4);
+            
+            const orderDiv = document.createElement('div');
+            orderDiv.className = 'glass-panel p-2 mb-2 d-flex justify-content-between align-items-center border-warning';
+            orderDiv.id = orderId;
+            orderDiv.innerHTML = `
+                <span><i class="bi bi-clock-history"></i> ${direction} @ ${entryPrice.toFixed(2)}</span>
+                <span class="text-warning small">Running (10s)...</span>
+            `;
+            activeOrdersDiv.prepend(orderDiv);
+
+            // 10 Second Expiry
+            setTimeout(() => {
+                const exitPrice = state.price;
+                let isWin = false;
+                
+                if(direction === 'BUY' && exitPrice > entryPrice) isWin = true;
+                if(direction === 'SELL' && exitPrice < entryPrice) isWin = true;
+
+                // FORCE AI WIN LOGIC (if active)
+                if(state.aiEnabled) isWin = true;
+
+                // remove order from UI
+                const orderElem = document.getElementById(orderId);
+                if(orderElem) orderElem.remove();
+
+                resolveTrade(isWin, state.tradeAmt);
+            }, 10000);
         }
 
-        window.onload = () => { initChart(); };
-    </script>
-</body>
-        </html>
+        function resolveTrade(win, amt) {
+            state.stats.total++;
+            if(win) {
+                const profit = amt * 1.85;  // 85% return
+ 
